@@ -1,0 +1,5 @@
+[projects.'\\?\C:\PaderCleanv1']
+trust_level = "trusted"
+
+[projects.'\\?\C:\manga']
+trust_level = "trusted"

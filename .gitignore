@@ -1,0 +1,20 @@
+# Root
+node_modules/
+dist/
+.env
+.DS_Store
+.idea/
+.vscode/
+coverage/
+
+# Storage runtime data (kept outside VCS)
+storage/originals/
+storage/pages/
+storage/thumbnails/
+storage/previews/
+storage/db/*.db
+storage/db/*.sqlite
+storage/db/*.sqlite3
+storage/**/*.tmp
+storage/**/.cache
+
