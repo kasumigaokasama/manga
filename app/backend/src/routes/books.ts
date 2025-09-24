@@ -12,7 +12,7 @@ import { XMLParser } from 'fast-xml-parser'
 import { db, paths } from '../db'
 import { authRequired } from '../middleware/auth'
 import { appendAudit } from '../util/audit'
-import type { Role } from '../types'
+import type { Role, BookFormat } from '../types'
 
 const router = Router()
 
@@ -35,7 +35,7 @@ const upload = multer({
 
 const QuerySchema = z.object({
   query: z.string().optional(),
-  format: z.string().optional(),
+  format: z.enum(['pdf', 'epub', 'cbz', 'images']).optional(),
   tag: z.string().optional(),
   lang: z.string().optional(),
   page: z.coerce.number().optional(),
@@ -50,7 +50,7 @@ router.get('/', authRequired(), async (req, res) => {
 
   let q = db.selectFrom('books').selectAll().where('deleted', '=', 0)
   if (query) q = q.where('title', 'like', `%${query}%`)
-  if (format) q = q.where('format', '=', format)
+  if (format) q = q.where('format', '=', format as BookFormat)
   if (lang) q = q.where('language', '=', lang)
   if (tag) {
     q = q
