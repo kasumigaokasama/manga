@@ -15,7 +15,7 @@ router.get('/', async (_req, res) => {
 })
 
 const CreateUser = z.object({
-  email: z.string().min(3),
+  email: z.string().email().transform((v) => v.toLowerCase()),
   password: z.string().min(6),
   role: z.enum(['admin', 'editor', 'reader'])
 })

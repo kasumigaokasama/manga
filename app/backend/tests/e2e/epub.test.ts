@@ -24,7 +24,7 @@ function buildMinimalEpub(title: string, creator: string, language: string) {
 
 describe('EPUB upload', () => {
   it('extracts cover and metadata', async () => {
-    const login = await request(app).post('/api/auth/login').send({ email: 'adminexample.com', password: 'ChangeThis123!' })
+    const login = await request(app).post('/api/auth/login').send({ email: 'admin@example.com', password: 'ChangeThis123!' })
     const token = login.body.accessToken
     const img = await sharp({ create: { width: 100, height: 150, channels: 3, background: { r: 240, g: 160, b: 200 } } }).jpeg().toBuffer()
     const zip = buildMinimalEpub('EPUB Title', 'Author X', 'ja')
@@ -39,7 +39,7 @@ describe('EPUB upload', () => {
     expect(res.status).toBe(201)
     const id = res.body.id
 
-    const bookRes = await request(app).get(`/api/books/${id}`)
+    const bookRes = await request(app).get(`/api/books/${id}`).set('Authorization', `Bearer ${token}`)
     expect(bookRes.status).toBe(200)
     // Title remains the given upload title, but language should be taken from EPUB
     expect(bookRes.body.book.title).toBe('Given Title')
