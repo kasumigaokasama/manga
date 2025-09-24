@@ -5,11 +5,10 @@ import { signal } from '@angular/core'
 import { ApiService, Book } from '../services/api.service'
 import { SettingsService } from '../services/settings.service'
 import { ThemeService } from '../services/theme.service'
-import * as pdfjsLib from 'pdfjs-dist/build/pdf'
-// @ts-expect-error - worker entry provided by pdfjs-dist
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs'
+import { GlobalWorkerOptions, getDocument, type PDFDocumentProxy } from 'pdfjs-dist'
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfWorker
+const workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url)
+GlobalWorkerOptions.workerSrc = workerSrc.toString()
 
 @Component({
   standalone: true,
@@ -93,7 +92,7 @@ export class ReaderPage implements OnDestroy {
   format: Book['format'] = 'images'
   totalPages: number | null = null
 
-  private pdfDoc: any
+  private pdfDoc: PDFDocumentProxy | null = null
   private suppressSync = false
   private progressTimer?: any
   private prefetchTimer?: any
@@ -152,7 +151,7 @@ export class ReaderPage implements OnDestroy {
     const token = this.api.token()
     if (token) headers['Authorization'] = `Bearer ${token}`
     const url = `${this.api.base}/api/books/${this.id}/stream`
-    this.pdfDoc = await (pdfjsLib as any).getDocument({ url, httpHeaders: headers }).promise
+    this.pdfDoc = await getDocument({ url, httpHeaders: headers }).promise
     try {
       this.totalPages = this.pdfDoc.numPages
     } catch {

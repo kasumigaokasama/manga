@@ -41,7 +41,19 @@ export function authRequired(roles?: Role[]) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
     try {
-      const payload = jwt.verify(token, JWT_SECRET) as JwtPayload
+      const decoded = jwt.verify(token, JWT_SECRET)
+      if (!decoded || typeof decoded === 'string') {
+        return res.status(401).json({ error: 'Invalid token' })
+      }
+      const raw = decoded as Record<string, unknown>
+      if (
+        typeof raw.sub !== 'number' ||
+        typeof raw.email !== 'string' ||
+        (raw.role !== 'admin' && raw.role !== 'editor' && raw.role !== 'reader')
+      ) {
+        return res.status(401).json({ error: 'Invalid token' })
+      }
+      const payload: JwtPayload = { sub: raw.sub, email: raw.email, role: raw.role }
       if (roles && !roles.includes(payload.role)) {
         return res.status(403).json({ error: 'Forbidden' })
       }

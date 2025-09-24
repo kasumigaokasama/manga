@@ -10,12 +10,13 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "tsConfig": "tsconfig.json",
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "assets": ["src/assets", "src/manifest.webmanifest"],
             "styles": [
-              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.css"
             ],
             "scripts": [],
@@ -38,5 +39,8 @@
       }
     }
   },
-  "defaultProject": "manga-shelf"
+  "defaultProject": "manga-shelf",
+  "cli": {
+    "analytics": false
+  }
 }

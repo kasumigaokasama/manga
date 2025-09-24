@@ -30,7 +30,7 @@ import { ToastContainerComponent } from './components/toast-container.component'
         <a mat-button *ngIf="api.role()==='admin' || api.role()==='editor'" routerLink="/upload">{{ i18n.t('upload') }}</a>
         <a mat-button *ngIf="api.role()==='admin'" routerLink="/admin">Admin</a>
         <a mat-button routerLink="/settings">{{ i18n.t('settings') }}</a>
-        <select class="ml-2 border rounded p-1" (change)="i18n.set(($event.target as HTMLSelectElement).value as any)">
+        <select class="ml-2 border rounded p-1" (change)="onLanguageSelect($event)">
           <option value="de" [selected]="i18n.lang()==='de'">DE</option>
           <option value="en" [selected]="i18n.lang()==='en'">EN</option>
           <option value="ja" [selected]="i18n.lang()==='ja'">日本語</option>
@@ -51,13 +51,13 @@ import { ToastContainerComponent } from './components/toast-container.component'
         </div>
         <div class="space-y-1">
           <label class="flex items-center gap-2">
-            <input type="checkbox" [checked]="theme.sakura()" (change)="theme.setSakura(($event.target as HTMLInputElement).checked)" /> Sakura an
+            <input type="checkbox" [checked]="theme.sakura()" (change)="onSakuraToggle($event)" /> Sakura an
           </label>
           <label class="flex items-center gap-2">
-            <input type="checkbox" [checked]="theme.blossoms()" (change)="theme.setBlossoms(($event.target as HTMLInputElement).checked)" /> Blüten an
+            <input type="checkbox" [checked]="theme.blossoms()" (change)="onBlossomsToggle($event)" /> Blüten an
           </label>
           <label class="flex items-center gap-2" *ngIf="!theme.sakura()">
-            <input type="checkbox" [checked]="theme.starfieldEnabled()" (change)="theme.setStarfieldEnabled(($event.target as HTMLInputElement).checked)" /> Sterne an
+            <input type="checkbox" [checked]="theme.starfieldEnabled()" (change)="onStarfieldToggle($event)" /> Sterne an
           </label>
         </div>
       </div>
@@ -83,5 +83,27 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() { this.bursts.off(this.listener) }
   themeMenuOpen = false
   helpOpen = false
+
+  onLanguageSelect(event: Event) {
+    const value = (event.target as HTMLSelectElement | null)?.value
+    if (value === 'de' || value === 'en' || value === 'ja') {
+      this.i18n.set(value)
+    }
+  }
+
+  onSakuraToggle(event: Event) {
+    const checked = (event.target as HTMLInputElement | null)?.checked ?? false
+    this.theme.setSakura(checked)
+  }
+
+  onBlossomsToggle(event: Event) {
+    const checked = (event.target as HTMLInputElement | null)?.checked ?? false
+    this.theme.setBlossoms(checked)
+  }
+
+  onStarfieldToggle(event: Event) {
+    const checked = (event.target as HTMLInputElement | null)?.checked ?? false
+    this.theme.setStarfieldEnabled(checked)
+  }
 }
 
