@@ -3,7 +3,8 @@ import { Injectable, signal } from '@angular/core'
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   sakura = signal<boolean>(localStorage.getItem('theme') !== 'dark')
-  blossoms = signal<boolean>(localStorage.getItem('blossoms') === '1')
+  // Default: blossoms on for first visit
+  blossoms = signal<boolean>((localStorage.getItem('blossoms') ?? '1') === '1')
   blossomsDensity = signal<number>(Number(localStorage.getItem('blossomsDensity') || '40'))
   blossomsSpeed = signal<number>(Number(localStorage.getItem('blossomsSpeed') || '1'))
   starDensity = signal<number>(Number(localStorage.getItem('starDensity') || '120'))
@@ -32,8 +33,8 @@ export class ThemeService {
     if (dayNight === 'sakura-day') {
       this.setSakura(true)
       this.setBlossoms(true)
-      this.setBlossomsDensity(40)
-      this.setBlossomsSpeed(1)
+      this.setBlossomsDensity(80)
+      this.setBlossomsSpeed(1.2)
       this.setStarfieldEnabled(false)
     } else if (dayNight === 'sakura-night') {
       this.setSakura(false)

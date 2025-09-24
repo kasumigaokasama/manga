@@ -4,15 +4,16 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { execFile } from 'node:child_process'
 import { z } from 'zod'
-import slugify from 'slugify'
+import slugifyModule from 'slugify'
+const slugify: any = (slugifyModule as any).default ?? (slugifyModule as any)
 import unzipper from 'unzipper'
 import sharp from 'sharp'
 import { PDFDocument } from 'pdf-lib'
 import { XMLParser } from 'fast-xml-parser'
-import { db, paths } from '../db'
-import { authRequired } from '../middleware/auth'
-import { appendAudit } from '../util/audit'
-import type { Role, BookFormat } from '../types'
+import { db, paths } from '../db.js'
+import { authRequired } from '../middleware/auth.js'
+import { appendAudit } from '../util/audit.js'
+import type { Role, BookFormat } from '../types.js'
 
 const router = Router()
 
@@ -123,6 +124,12 @@ router.get('/:id/stream', authRequired(), async (req, res) => {
   const stat = fs.statSync(file)
   const range = req.headers.range
   const contentType = contentTypeForPath(file)
+  // For EPUB, prefer forcing a download with a sensible filename
+  const extraHeaders: Record<string, string> = {}
+  if (book.format === 'epub') {
+    const baseName = slugify(path.parse(book.filePath).name || `book-${book.id}`, { lower: true, strict: true })
+    extraHeaders['Content-Disposition'] = `attachment; filename="${baseName}.epub"`
+  }
   if (range) {
     const [startStr, endStr] = range.replace(/bytes=/, '').split('-')
     let start = Number.parseInt(startStr, 10)
@@ -140,7 +147,7 @@ router.get('/:id/stream', authRequired(), async (req, res) => {
       'Content-Length': chunkSize,
       'Content-Type': contentType,
       'Cache-Control': 'private, max-age=0'
-    })
+    , ...extraHeaders })
     fs.createReadStream(file, { start, end }).pipe(res)
   } else {
     res.writeHead(200, {
@@ -148,9 +155,63 @@ router.get('/:id/stream', authRequired(), async (req, res) => {
       'Content-Type': contentType,
       'Accept-Ranges': 'bytes',
       'Cache-Control': 'private, max-age=0'
-    })
+    , ...extraHeaders })
     fs.createReadStream(file).pipe(res)
   }
+})
+
+// HEAD for stream to allow clients to probe size/type without downloading
+router.head('/:id/stream', authRequired(), async (req, res) => {
+  const id = Number(req.params.id)
+  if (!Number.isFinite(id) || id <= 0) return res.status(400).end()
+  const book = await db
+    .selectFrom('books')
+    .selectAll()
+    .where('id', '=', id)
+    .where('deleted', '=', 0)
+    .executeTakeFirst()
+  if (!book) return res.status(404).end()
+  const file = book.filePath
+  if (!fs.existsSync(file)) return res.status(410).end()
+  const stat = fs.statSync(file)
+  const contentType = contentTypeForPath(file)
+  const headers: Record<string, string | number> = {
+    'Content-Length': stat.size,
+    'Content-Type': contentType,
+    'Accept-Ranges': 'bytes',
+    'Cache-Control': 'private, max-age=0'
+  }
+  if (book.format === 'epub') {
+    const baseName = slugify(path.parse(book.filePath).name || `book-${book.id}`, { lower: true, strict: true })
+    headers['Content-Disposition'] = `attachment; filename="${baseName}.epub"`
+  }
+  res.writeHead(200, headers)
+  res.end()
+})
+
+// Explicit download route for original file (forces attachment)
+router.get('/:id/download', authRequired(), async (req, res) => {
+  const id = Number(req.params.id)
+  if (!Number.isFinite(id) || id <= 0) return res.status(400).end()
+  const book = await db
+    .selectFrom('books')
+    .selectAll()
+    .where('id', '=', id)
+    .where('deleted', '=', 0)
+    .executeTakeFirst()
+  if (!book) return res.status(404).end()
+  const file = book.filePath
+  if (!fs.existsSync(file)) return res.status(410).end()
+  const stat = fs.statSync(file)
+  const contentType = contentTypeForPath(file)
+  const baseName = slugify(path.parse(book.filePath).name || `book-${book.id}`, { lower: true, strict: true })
+  res.writeHead(200, {
+    'Content-Length': stat.size,
+    'Content-Type': contentType,
+    'Content-Disposition': `attachment; filename="${baseName}${path.extname(file)}"`,
+    'Cache-Control': 'private, max-age=0'
+  })
+  fs.createReadStream(file).pipe(res)
 })
 
 router.get('/:id/pages/:n', authRequired(), async (req, res) => {

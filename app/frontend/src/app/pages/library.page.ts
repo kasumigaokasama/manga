@@ -29,22 +29,39 @@ import { signal } from '@angular/core'
       </select>
       <select class="border p-2 rounded" (change)="onSort($event)">
         <option value="createdAt.desc">Neueste zuerst</option>
-        <option value="createdAt.asc">Älteste zuerst</option>
-        <option value="title.asc">Titel A–Z</option>
-        <option value="title.desc">Titel Z–A</option>
+        <option value="createdAt.asc">Aelteste zuerst</option>
+        <option value="title.asc">Titel A-Z</option>
+        <option value="title.desc">Titel Z-A</option>
         <option value="updatedAt.desc">Zuletzt aktualisiert</option>
       </select>
     </section>
 
     <div class="grid gap-3" [ngStyle]="{ 'grid-template-columns': gridCols }">
       <article class="card hover:shadow-lg transition relative group" *ngFor="let b of books()" (mouseenter)="pop($event)">
+        <a
+          class="absolute top-2 left-2 bg-matcha text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100"
+          [href]="downloadHref(b)"
+          (click)="$event.stopPropagation()"
+          download
+          title="Original herunterladen"
+          aria-label="Original herunterladen"
+        >DL</a>
+        <button
+          class="absolute top-2 left-12 bg-gray-200 text-aizome rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100"
+          (click)="toggleMenu(b.id, $event)"
+          title="Mehr Optionen"
+          aria-label="Mehr Optionen"
+        >⋮</button>
+        <div *ngIf="openMenuFor===b.id" class="absolute z-20 top-12 left-2 bg-white border rounded shadow text-sm p-2 min-w-[160px]" (click)="$event.stopPropagation()">
+          <a class="block px-2 py-1 hover:bg-gray-100 rounded" [href]="downloadHref(b)" download>Original herunterladen</a>
+        </div>
         <button
           *ngIf="api.role() === 'admin' || api.role() === 'editor'"
           class="absolute top-2 right-2 bg-kurenai text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100"
           (click)="remove(b.id, $event)"
-          aria-label="Buch löschen"
+          aria-label="Buch Loeschen"
         >
-          ✕
+          X
         </button>
         <a [routerLink]="['/reader', b.id]" class="block">
           <div class="aspect-[2/3] bg-kumo rounded overflow-hidden flex items-center justify-center">
@@ -61,8 +78,8 @@ import { signal } from '@angular/core'
           <div class="text-sm text-gray-600 truncate">{{ b.author || 'Unbekannt' }}</div>
           <div class="text-xs text-gray-500 flex gap-2 mt-1">
             <span>{{ b.format | uppercase }}</span>
-            <span *ngIf="b.language">• {{ b.language }}</span>
-            <span *ngIf="b.pageCount">• {{ b.pageCount }} Seiten</span>
+            <span *ngIf="b.language">* {{ b.language }}</span>
+            <span *ngIf="b.pageCount">* {{ b.pageCount }} Seiten</span>
           </div>
         </a>
       </article>
@@ -91,6 +108,7 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
   private sort = 'createdAt.desc'
   private page = 1
   private observer?: IntersectionObserver
+  openMenuFor: number | null = null
 
   @ViewChild('sentinel') sentinel?: ElementRef<HTMLDivElement>
 
@@ -142,6 +160,18 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
     this.languages.set(await this.api.getLanguages())
   }
 
+  downloadHref(b: Book) {
+    const token = this.api.token()
+    const url = new URL(`${this.api.base}/api/books/${b.id}/download`)
+    if (token) url.searchParams.set('token', token)
+    return url.toString()
+  }
+
+  toggleMenu(id: number, ev: Event) {
+    ev.stopPropagation()
+    this.openMenuFor = this.openMenuFor === id ? null : id
+  }
+
   onQuery(event: Event) {
     this.query = (event.target as HTMLInputElement).value.trim()
     this.load(true)
@@ -170,12 +200,12 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
   async remove(id: number, ev: Event) {
     ev.stopPropagation()
     ev.preventDefault()
-    if (!confirm('Wirklich löschen?')) return
+    if (!confirm('Wirklich Loeschen?')) return
     try {
       await this.api.deleteBook(id)
       await this.load(true)
     } catch {
-      alert('Löschen fehlgeschlagen')
+      alert('Loeschen fehlgeschlagen')
     }
   }
 
@@ -199,3 +229,7 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
     this.observer?.disconnect()
   }
 }
+
+
+
+

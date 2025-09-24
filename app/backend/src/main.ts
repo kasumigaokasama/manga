@@ -1,5 +1,5 @@
-import { ensureStorage, migrateAndSeed } from './db'
-import { createApp } from './app'
+import { ensureStorage, migrateAndSeed } from './db.js'
+import { createApp } from './app.js'
 
 const PORT = Number(process.env.PORT || 3000)
 

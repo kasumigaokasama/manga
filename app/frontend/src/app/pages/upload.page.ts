@@ -13,7 +13,7 @@ import { ToastService } from '../services/toast.service'
     <section class="max-w-xl mx-auto card space-y-4">
       <h1 class="text-lg font-bold">Upload</h1>
       <p class="text-sm text-gray-600">
-        Unterstützte Formate: PDF, EPUB, CBZ/ZIP oder ZIP mit Bilder-Ordnern. Die Dateien landen in
+        Unterstuetzte Formate: PDF, EPUB, CBZ/ZIP oder ZIP mit Bilder-Ordnern. Die Dateien landen in
         <code>storage/originals</code>.
       </p>
       <form (ngSubmit)="submit()" class="space-y-3">
@@ -42,13 +42,13 @@ import { ToastService } from '../services/toast.service'
           (dragleave)="onDragLeave($event)"
           (drop)="onDrop($event)"
         >
-          <p class="mb-2">Datei hier ablegen oder auswählen</p>
+          <p class="mb-2">Datei hier ablegen oder auswaehlen</p>
           <input type="file" class="w-full" (change)="onFile($event)" />
-          <p *ngIf="file" class="mt-2 text-sm text-gray-600">Ausgewählt: {{ file?.name }}</p>
+          <p *ngIf="file" class="mt-2 text-sm text-gray-600">Ausgewaehlt: {{ file?.name }}</p>
         </div>
 
         <button class="bg-matcha text-white px-4 py-2 rounded w-full" [disabled]="busy">
-          {{ busy ? 'Upload läuft…' : 'Hochladen' }}
+          {{ busy ? 'Upload laeuft...' : 'Hochladen' }}
         </button>
       </form>
 
@@ -98,7 +98,7 @@ export class UploadPage {
 
   async submit() {
     if (!this.file) {
-      this.toast.show('Bitte eine Datei auswählen.', 'error')
+      this.toast.show('Bitte eine Datei auswaehlen.', 'error')
       return
     }
     const form = new FormData()
@@ -159,3 +159,4 @@ export class UploadPage {
     })
   }
 }
+

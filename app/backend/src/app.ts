@@ -4,12 +4,12 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import path from 'node:path'
-import authRoutes from './routes/auth'
-import booksRoutes from './routes/books'
-import tagsRoutes from './routes/tags'
-import usersRoutes from './routes/users'
-import auditRoutes from './routes/audit'
-import accountRoutes from './routes/account'
+import authRoutes from './routes/auth.js'
+import booksRoutes from './routes/books.js'
+import tagsRoutes from './routes/tags.js'
+import usersRoutes from './routes/users.js'
+import auditRoutes from './routes/audit.js'
+import accountRoutes from './routes/account.js'
 import { RateLimiterMemory } from 'rate-limiter-flexible'
 
 export function createApp() {
@@ -45,6 +45,11 @@ export function createApp() {
 
   // Health
   app.get('/api/health', (_req, res) => res.json({ ok: true }))
+
+  // Root helper
+  app.get('/', (_req, res) => {
+    res.status(200).send('Manga Shelf API. Try GET /api/health')
+  })
 
   // Static read-only assets
   app.use('/thumbnails', express.static(path.resolve('storage/thumbnails')))

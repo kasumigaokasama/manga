@@ -27,8 +27,9 @@ GlobalWorkerOptions.workerSrc = workerSrc.toString()
           <button class="px-2 py-1 bg-gray-200 rounded" (click)="zoomOut()">-</button>
           <button class="px-2 py-1 bg-gray-200 rounded" (click)="zoomIn()">+</button>
           <button class="px-2 py-1 bg-gray-200 rounded" (click)="fullscreen()">Fullscreen</button>
-          <button class="px-2 py-1 bg-gray-200 rounded" (click)="prev()">←</button>
-          <button class="px-2 py-1 bg-gray-200 rounded" (click)="next()">→</button>
+          <a [href]="downloadUrl()" download class="px-2 py-1 bg-matcha text-white rounded">Original</a>
+          <button class="px-2 py-1 bg-gray-200 rounded" (click)="prev()">&larr;</button>
+          <button class="px-2 py-1 bg-gray-200 rounded" (click)="next()">&rarr;</button>
         </div>
       </div>
 
@@ -41,8 +42,8 @@ GlobalWorkerOptions.workerSrc = workerSrc.toString()
       </div>
 
       <div *ngIf="format === 'epub'" class="p-6 border rounded bg-kumo text-center space-y-2">
-        <p class="text-sm">EPUB-Dateien werden aktuell als Download ausgeliefert. Öffne die Datei mit deinem bevorzugten Reader.</p>
-        <a [href]="streamUrl()" class="inline-block bg-matcha text-white px-4 py-2 rounded" download>EPUB herunterladen</a>
+        <p class="text-sm">EPUB-Dateien werden als Download ausgeliefert. Oeffne die Datei mit deinem bevorzugten Reader.</p>
+        <a [href]="downloadUrl()" class="inline-block bg-matcha text-white px-4 py-2 rounded" download>EPUB herunterladen</a>
       </div>
 
       <div
@@ -271,6 +272,13 @@ export class ReaderPage implements OnDestroy {
     return url.toString()
   }
 
+  downloadUrl() {
+    const token = this.api.token()
+    const url = new URL(`${this.api.base}/api/books/${this.id}/download`)
+    if (token) url.searchParams.set('token', token)
+    return url.toString()
+  }
+
   private setPage(newPage: number) {
     const max = this.totalPages ?? Number.MAX_SAFE_INTEGER
     const clamped = Math.max(1, Math.min(max, Math.floor(newPage)))
@@ -361,3 +369,5 @@ export class ReaderPage implements OnDestroy {
     clearTimeout(this.prefetchTimer)
   }
 }
+
+

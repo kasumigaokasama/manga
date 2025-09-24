@@ -10,7 +10,7 @@ Selbstgehostetes Monorepo für dein privates Bücher- und Manga-Regal. Frontend:
 | --- | --- |
 | Hardware | z. B. ThinkPad/NUC mit Ubuntu Server 24.04 LTS, 4 GB RAM, SSD |
 | OS/Tools | `sudo apt update && sudo apt install -y git curl build-essential nginx python3-pip` |
-| Node.js | Node 20.x (z. B. via `curl -fsSL https://deb.nodesource.com/setup_20.x \| sudo -E bash -`, danach `sudo apt install nodejs`) |
+| Node.js | Node 20.x (z. B. via `curl -fsSL https://deb.nodesource.com/setup_20.x \| sudo -E bash -`, danach `sudo apt install nodejs`). Hinweis: `.nvmrc` pinnt Node 20 — `nvm use` wählt die richtige Version. |
 | PM2 | `sudo npm install -g pm2` |
 | SQLite & Bildverarbeitung | `sudo apt install -y sqlite3 libvips-dev` (für `sharp`), `sudo apt install -y poppler-utils` (pdftoppm für PDF-Cover) |
 | SSH | Zugriff z. B. `ssh user@dein-server` |
@@ -123,6 +123,8 @@ storage/
 * API prüft Magic-Bytes, generiert Cover + Preview (PDF via `pdftoppm`, CBZ via `sharp`).
 * Reader (`/reader/:id`):
   - **PDF:** PDF.js mit Range-Streaming, Zoom, Vollbild.
+  - **EPUB:** Als Download ausgeliefert (GET `/api/books/:id/download`, setzt Content-Disposition).
+  - **HEAD:** `HEAD /api/books/:id/stream` liefert `Content-Length`, `Content-Type` und `Accept-Ranges`.
   - **Manga:** Bild-Scroller, Standard **RTL**, Spread (2-up), Zoom, Gesten (Swipe). Fortschritt wird alle 400 ms synchronisiert.
   - **Keybindings:** ←/→ Seitenwechsel (RTL respektiert), `[`/`]` Zoom, `F` Fullscreen, `R` Richtung, `S` Spread, `D` Sakura/Night Toggle.
 * Settings: Sakura-Blüten, Canvas-Dichte, Sternenhimmel (Night), Standard-Leserichtung/-Spread, dezente Sounds.
@@ -204,6 +206,8 @@ Logs:
 * **Backup-Skript:** `docs/backup.example.sh`
 * **PM2-Konfiguration:** `ecosystem.config.cjs`
 * **.env Vorlage:** `app/backend/.env.example`
+* **Dev-Setup (Windows/WSL/Linux):** `docs/DEV.md`
+* **Publishing (Ubuntu + Nginx + PM2):** `docs/PUBLISHING.md`
 
 ### Dev/Build-Skripte (Root `package.json`)
 

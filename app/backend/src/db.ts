@@ -2,7 +2,7 @@ import DatabaseDriver from 'better-sqlite3'
 import { Kysely, SqliteDialect } from 'kysely'
 import path from 'node:path'
 import fs from 'node:fs'
-import { Database } from './types'
+import type { Database } from './types.js'
 
 const storageRoot = process.env.STORAGE_DIR || path.resolve(process.cwd(), '..', '..', 'storage')
 const dbDir = path.join(storageRoot, 'db')

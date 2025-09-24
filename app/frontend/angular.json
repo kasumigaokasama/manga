@@ -33,13 +33,13 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "manga-shelf:build"
+            "buildTarget": "manga-shelf:build"
           }
         }
       }
     }
   },
-  "defaultProject": "manga-shelf",
+  
   "cli": {
     "analytics": false
   }

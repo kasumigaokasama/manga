@@ -1,0 +1,4 @@
+{"ts":"2025-09-24T20:28:39.907Z","event":"book_upload","userId":1,"bookId":1,"title":"berserk","format":"pdf","language":"eng","tags":[]}
+{"ts":"2025-09-24T20:30:24.003Z","event":"book_delete","userId":1,"bookId":1}
+{"ts":"2025-09-24T20:38:20.161Z","event":"book_upload","userId":1,"bookId":2,"title":"berserk","format":"pdf","language":"eng","tags":["action shonen"]}
+{"ts":"2025-09-24T20:40:36.623Z","event":"user_create","adminId":1,"userId":4,"email":"yusufkayaspam@gmail.com","role":"reader"}

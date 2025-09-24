@@ -46,5 +46,29 @@ describe('EPUB upload', () => {
     expect(bookRes.body.book.language).toBe('ja')
     expect(bookRes.body.book.coverPath).toMatch(/\/thumbnails\//)
   })
+
+  it('serves explicit EPUB download with attachment', async () => {
+    const login = await request(app).post('/api/auth/login').send({ email: 'admin@example.com', password: 'ChangeThis123!' })
+    const token = login.body.accessToken
+    const img = await sharp({ create: { width: 80, height: 120, channels: 3, background: { r: 230, g: 180, b: 220 } } }).jpeg().toBuffer()
+    const zip = buildMinimalEpub('DL Title', 'Author Y', 'en')
+    zip.addFile('OEBPS/cover.jpg', img)
+    const epubBuf = zip.toBuffer()
+
+    const res = await request(app)
+      .post('/api/books/upload')
+      .set('Authorization', `Bearer ${token}`)
+      .field('title', 'DL Given Title')
+      .attach('file', epubBuf, { filename: 'd.epub', contentType: 'application/epub+zip' })
+    expect(res.status).toBe(201)
+    const id = res.body.id
+
+    const dl = await request(app)
+      .get(`/api/books/${id}/download`)
+      .set('Authorization', `Bearer ${token}`)
+    expect(dl.status).toBe(200)
+    expect(dl.headers['content-type']).toBe('application/epub+zip')
+    expect(dl.headers['content-disposition']).toMatch(/attachment; filename=".*\.epub"/)
+  })
 })
 

@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-import { JwtPayload, Role } from '../types'
+import type { JwtPayload, Role } from '../types.js'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret'
 

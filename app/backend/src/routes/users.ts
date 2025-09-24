@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import { authRequired } from '../middleware/auth'
-import { db } from '../db'
+import { authRequired } from '../middleware/auth.js'
+import { db } from '../db.js'
 import { z } from 'zod'
 import bcrypt from 'bcrypt'
-import { appendAudit } from '../util/audit'
+import { appendAudit } from '../util/audit.js'
 
 const router = Router()
 

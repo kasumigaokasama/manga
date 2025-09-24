@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import { z } from 'zod'
-import { db } from '../db'
+import { db } from '../db.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { authRequired } from '../middleware/auth'
+import { authRequired } from '../middleware/auth.js'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret'
 const router = Router()

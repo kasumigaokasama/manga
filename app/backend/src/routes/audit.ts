@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import fs from 'node:fs'
 import path from 'node:path'
-import { authRequired } from '../middleware/auth'
+import { authRequired } from '../middleware/auth.js'
 
 const router = Router()
 
@@ -21,4 +21,3 @@ router.get('/', authRequired(['admin']), async (req, res) => {
 })
 
 export default router
-

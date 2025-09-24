@@ -41,7 +41,7 @@ import { ApiService, AdminUser } from '../services/api.service'
                 <td>{{ u.createdAt | date:'short' }}</td>
                 <td>
                   <button class="bg-gray-200 rounded px-3 py-1 mr-2" (click)="setPassword(u)">Passwort</button>
-                  <button class="bg-kurenai text-white rounded px-3 py-1" (click)="remove(u)">Löschen</button>
+                  <button class="bg-kurenai text-white rounded px-3 py-1" (click)="remove(u)">Loeschen</button>
                 </td>
               </tr>
             </tbody>
@@ -83,11 +83,11 @@ export class AdminPage implements OnInit {
     } catch { alert('Update fehlgeschlagen') }
   }
   async remove(u: AdminUser) {
-    if (!confirm(`Benutzer ${u.email} löschen?`)) return
+    if (!confirm(`Benutzer ${u.email} loeschen?`)) return
     try {
       await fetch(`${this.api.base}/api/users/${u.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${this.api.token()}` } })
       await this.load()
-    } catch { alert('Löschen fehlgeschlagen') }
+    } catch { alert('Loeschen fehlgeschlagen') }
   }
   async setPassword(u: AdminUser) {
     const p = prompt(`Neues Passwort für ${u.email}:`)
@@ -95,3 +95,5 @@ export class AdminPage implements OnInit {
     try { await this.api.adminSetPassword(u.id, p); alert('Passwort gesetzt') } catch { alert('Fehlgeschlagen') }
   }
 }
+
+

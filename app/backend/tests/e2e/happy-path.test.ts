@@ -84,6 +84,13 @@ describe('E2E happy path', () => {
     expect(res.status).toBe(201)
     const id = res.body.id
 
+    // HEAD should expose content-length/type and accept-ranges
+    const headRes = await request(app).head(`/api/books/${id}/stream`).set('Authorization', `Bearer ${token}`)
+    expect(headRes.status).toBe(200)
+    expect(headRes.headers['accept-ranges']).toBe('bytes')
+    expect(headRes.headers['content-type']).toBe('application/pdf')
+    expect(Number(headRes.headers['content-length'] || '0')).toBeGreaterThan(0)
+
     const rangeRes = await request(app).get(`/api/books/${id}/stream`).set('Authorization', `Bearer ${token}`).set('Range', 'bytes=0-99')
     expect(rangeRes.status).toBe(206)
     expect(rangeRes.headers['content-range']).toMatch(/^bytes 0-99\//)

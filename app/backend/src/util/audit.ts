@@ -12,4 +12,3 @@ export function appendAudit(event: string, data: Record<string, any>) {
     // best effort only
   }
 }
-
