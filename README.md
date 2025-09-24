@@ -1,135 +1,217 @@
-# Manga Shelf – Privates Bücher/Manga-Regal (Monorepo)
+# Manga Shelf – Privates Bücher/Manga-Regal
 
-Privates, selbstgehostetes Bücher/Manga-Regal. Frontend: Angular v20 (Standalone, Tailwind, Angular Material – Sakura-Toolbar). Backend: Node 20, Express, TypeScript, SQLite (Kysely). Upload (PDF/EPUB/CBZ/JPG-Ordner), Bibliothek, Reader (PDF.js & Manga-Images), JWT-Login. Deployment: PM2, Nginx, Let’s Encrypt. Nur für dich & Freunde.
+Selbstgehostetes Monorepo für dein privates Bücher- und Manga-Regal. Frontend: **Angular v20** mit Tailwind & Angular Material. Backend: **Node.js 20 + Express + TypeScript** auf SQLite (Kysely). Features: Upload (PDF/EPUB/CBZ/Bilder-ZIP), Sakura/Manga-Theme, PDF.js-Reader, Manga-Reader (RTL, 2-up, Gesten), Lesefortschritt via JWT. Deployment per **PM2 + Nginx + Let’s Encrypt** auf Ubuntu.
+
+---
 
 ## 1) Voraussetzungen
-- Ubuntu Server 24.04 (oder lokal), SSH, Node.js 20, npm, Nginx, PM2, Git
-- SSH Basics: `ssh user@server` (Port ggf. `-p 22`)
+
+| Komponente | Hinweise |
+| --- | --- |
+| Hardware | z. B. ThinkPad/NUC mit Ubuntu Server 24.04 LTS, 4 GB RAM, SSD |
+| OS/Tools | `sudo apt update && sudo apt install -y git curl build-essential nginx python3-pip` |
+| Node.js | Node 20.x (z. B. via `curl -fsSL https://deb.nodesource.com/setup_20.x \| sudo -E bash -`, danach `sudo apt install nodejs`) |
+| PM2 | `sudo npm install -g pm2` |
+| SQLite & Bildverarbeitung | `sudo apt install -y sqlite3 libvips-dev` (für `sharp`), `sudo apt install -y poppler-utils` (pdftoppm für PDF-Cover) |
+| SSH | Zugriff z. B. `ssh user@dein-server` |
+
+> **Wichtig:** `better-sqlite3` kompiliert native Addons. Stelle sicher, dass `build-essential` und `python3` installiert sind.
 
 ## 2) Projekt holen & installieren
+
 ```bash
-# Klonen
-git clone <REPO_URL> manga-shelf && cd manga-shelf
+git clone <REPO_URL> manga-shelf
+cd manga-shelf
 
-# Abhängigkeiten
-cd app/backend && npm i && cd -
-cd app/frontend && npm i && cd -
+# Backend
+cd app/backend
+npm install
+cp .env.example .env
+cd ../../
 
-# Env
-cp app/backend/.env.example app/backend/.env
+# Frontend
+cd app/frontend
+npm install
+cd ../../
 
-# Entwicklung starten
-npm run dev   # Frontend http://localhost:4200, Backend http://localhost:3000
+# Entwicklung
+npm run dev   # http://localhost:4200 (Angular) + http://localhost:3000 (API)
+
+# Tests (Backend)
+npm run test         # vitest (Unit + E2E)
+npm run test:unit
+npm run test:e2e
 
 # Produktionsbuild
-npm run build # erzeugt: app/frontend/dist + app/backend/dist
+npm run build        # erstellt app/frontend/dist & app/backend/dist
+
+# PM2 (Produktion)
+pm2 start ecosystem.config.cjs
+pm2 save
+pm2 startup          # erzeugt systemd-Service (Befehl ausführen)
 ```
-Standard-Login (Seed): `adminexample.com` / `ChangeThis123!`
+
+Standard-Accounts nach Seed (`npm run dev`/`npm run build` führt Migration+Seed aus):
+
+| Rolle | Login |
+| --- | --- |
+| Admin | `admin@example.com` / `ChangeThis123!` |
+| Leser | `friend1@example.com` / `ChangeThis123!`, `friend2@example.com` / `ChangeThis123!` |
 
 ## 3) Nginx einrichten
-- Angular Dist kopieren: `sudo rsync -avh --delete app/frontend/dist/ /var/www/manga-shelf/dist/`
-- VHost aus `docs/nginx.example.conf` anpassen → `/etc/nginx/sites-available/manga-shelf`
+
+1. Angular-Build auf Server kopieren (vom lokalen Rechner):
+   ```bash
+   rsync -avh --delete app/frontend/dist/ user@server:/var/www/manga-shelf/dist/
+   ```
+2. Beispiel-VHost übernehmen (`docs/nginx.example.conf`):
+   ```bash
+   sudo mkdir -p /var/www/manga-shelf/dist
+   sudo cp docs/nginx.example.conf /etc/nginx/sites-available/manga-shelf
+   sudo ln -s /etc/nginx/sites-available/manga-shelf /etc/nginx/sites-enabled/
+   sudo nginx -t
+   sudo systemctl reload nginx
+   ```
+3. `client_max_body_size` ggf. in der Server- oder http-Section ergänzen (z. B. `client_max_body_size 1G;`) falls große Uploads.
+
+## 4) Domain (GoDaddy)
+
+1. Öffentliche IP ermitteln: `curl ifconfig.me`
+2. Im GoDaddy-Dashboard A-Records für `@` und `www` auf die öffentliche IPv4 setzen.
+3. Hinweis: Bei DS-Lite/CGNAT erreichst du keine öffentliche IPv4. Alternativen: Dual-Stack buchen, Cloudflare Tunnel oder Tailscale/Syncthing für privaten Zugriff.
+
+## 5) HTTPS (Let’s Encrypt)
+
 ```bash
-sudo ln -s /etc/nginx/sites-available/manga-shelf /etc/nginx/sites-enabled/
+sudo certbot --nginx -d deine-domain.tld -d www.deine-domain.tld
+sudo systemctl reload nginx
+```
+
+Certbot aktualisiert die Nginx-Konfiguration automatisch. Erneuere Zertifikate per `sudo certbot renew --dry-run` testen.
+
+## 6) Zugang beschränken – zwei Wege
+
+### A) Nginx Basic Auth (optional, zusätzlicher Schutz)
+
+```bash
+sudo apt install apache2-utils
+sudo htpasswd -c /etc/nginx/.mangashelf_users <BENUTZERNAME>
+# In docs/nginx.example.conf die auth_basic-Zeilen einkommentieren
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-## 4) Domain (GoDaddy)
-- A-Records `@` und `www` auf öffentliche IPv4 (`curl ifconfig.me`).
-- DS-Lite/CGNAT Hinweis: ggf. Dual-Stack buchen oder Tailscale als Alternative.
+### B) App-Login (JWT)
 
-## 5) HTTPS (Let’s Encrypt)
-```bash
-sudo certbot --nginx -d deine-domain.tld -d www.deine-domain.tld
-```
-
-## 6) Zugang beschränken
-- A) Nginx Basic Auth (optional):
-```bash
-sudo apt install apache2-utils
-sudo htpasswd -c /etc/nginx/.mangashelf_users <name>
-# Direktiven in nginx.example.conf aktivieren, nginx neu laden
-```
-- B) App-Login (JWT): Login-Seite, Rollen (admin/editor/reader), Logout; Token lokal gespeichert.
-  - Passwort ändern: Seite „Einstellungen“ enthält Formular (aktuell + neu). API: `PATCH /api/account/password`.
+* Login unter `/login` (Token in `localStorage`), Logout-Button in der Toolbar.
+* Rollen: `admin` (Upload/Userverwaltung), `editor` (Upload), `reader` (nur Lesen).
+* Passwort ändern unter `/settings` → „Passwort ändern“ (API: `PATCH /api/account/password`).
 
 ## 7) Upload & Nutzung
-- Speicherorte: `storage/originals`, `storage/pages`, `storage/thumbnails`, `storage/previews`, `storage/db`.
-- Große Uploads: Nginx `client_max_body_size 1G;` setzen, falls 413.
-- PDF-Cover: Für Thumbnails `poppler-utils` (pdftoppm) installieren (siehe Kommentar im Code).
-- Reader: PDF inline mit pdf.js; Manga-Viewer mit RTL/LTR, 2‑up, Zoom, Fullscreen, Swipe. Fortschritt wird synchronisiert.
 
-## 8) DynDNS (GoDaddy DDNS)
-- `docs/godaddy-ddns/update.sh` anpassen (`DOMAIN`, `KEY`, `SECRET`), ausführbar: `chmod +x docs/godaddy-ddns/update.sh`.
-- Cron: `*/5 * * * * /path/to/docs/godaddy-ddns/update.sh >> /var/log/godaddy-ddns.log 2>&1`
+**Storage-Layout (`/storage`):**
 
-## 9) Betrieb (PM2)
-```bash
-npm run build
-pm2 start ecosystem.config.cjs
-pm2 save && pm2 startup
+```
+storage/
+  originals/   # Originaldateien (PDF/EPUB/CBZ/ZIP)
+  pages/       # extrahierte Seitenbilder
+  thumbnails/  # 256px Cover
+  previews/    # 1024px Vorschau
+  db/          # SQLite DB + Audit-Log
 ```
 
-## 10) Backups
-- Beispielskript: `docs/backup.example.sh` anpassen. Täglich 03:30: `30 3 * * * /path/to/docs/backup.example.sh`
+* Upload-Formular (`/upload`): Drag & Drop, Fortschrittsbalken, Tags, Sprache.
+* API prüft Magic-Bytes, generiert Cover + Preview (PDF via `pdftoppm`, CBZ via `sharp`).
+* Reader (`/reader/:id`):
+  - **PDF:** PDF.js mit Range-Streaming, Zoom, Vollbild.
+  - **Manga:** Bild-Scroller, Standard **RTL**, Spread (2-up), Zoom, Gesten (Swipe). Fortschritt wird alle 400 ms synchronisiert.
+  - **Keybindings:** ←/→ Seitenwechsel (RTL respektiert), `[`/`]` Zoom, `F` Fullscreen, `R` Richtung, `S` Spread, `D` Sakura/Night Toggle.
+* Settings: Sakura-Blüten, Canvas-Dichte, Sternenhimmel (Night), Standard-Leserichtung/-Spread, dezente Sounds.
 
-## 11) Troubleshooting
-- 502/504: API down? `pm2 logs manga-shelf-api`
-- 413: `client_max_body_size` erhöhen.
-- CORS: `CORS_ORIGIN` in `.env` anpassen.
-- Rechte: Schreibrechte für `storage/*` sicherstellen.
+## 8) DynDNS (GoDaddy-DDNS)
 
-## Admin-Header-Token (Optional)
-- Setze `ADMIN_TOKEN` in `app/backend/.env`. Dann sind Upload/DELETE zusätzlich über `X-Admin-Token: <token>` erlaubt (praktisch für Skripte). JWT-Auth bleibt weiterhin aktiv.
+Skript: `docs/godaddy-ddns/update.sh`
 
-## 12) Sicherheit & Rechtstext
-- Privat halten, starke Passwörter, keine Secrets committen.
+```bash
+chmod +x docs/godaddy-ddns/update.sh
+DOMAIN="example.com" KEY="<API_KEY>" SECRET="<API_SECRET>" ./docs/godaddy-ddns/update.sh
+```
+
+Cronjob alle 5 Minuten (als root):
+
+```
+*/5 * * * * /pfad/zur/repo/docs/godaddy-ddns/update.sh >> /var/log/godaddy-ddns.log 2>&1
+```
+
+## 9) Backups
+
+Beispielskript: `docs/backup.example.sh` (tar.gz aller Speicherordner). Ausführbar machen und per Cron laufen lassen:
+
+```bash
+chmod +x docs/backup.example.sh
+30 3 * * * /pfad/zur/repo/docs/backup.example.sh >> /var/log/manga-backup.log 2>&1
+```
+
+Backups sicher extern ablegen (NAS/Cloud). Zusätzlich Git-Repo regelmäßig pullen.
+
+## 10) Power & Recovery
+
+* **BIOS**: „After Power Loss: Power On“ aktivieren, damit der Server nach Stromausfall selbst startet.
+* **PM2**: `pm2 save` + `pm2 startup` ausführen → automatischer Neustart des Node-Backends.
+* **USV** optional für sauberes Herunterfahren bei längeren Ausfällen.
+
+## 11) Energiesparen (ThinkPad-Beispiel)
+
+* `sudo apt install tlp tlp-rdw` → `sudo tlp start`
+* `sudo powertop --auto-tune` (ggf. per systemd-Service automatisieren)
+* SSD/PCIe-Power-Management aktivieren, nicht benötigte Dienste deaktivieren
+* Ziel: <20 W Idle (je nach Hardware)
+
+## 12) Troubleshooting
+
+| Problem | Lösung |
+| --- | --- |
+| **502 / 504 Gateway** | Prüfen, ob PM2-Process läuft (`pm2 status`), Logs ansehen (`pm2 logs manga-shelf-api`). |
+| **413 Payload Too Large** | `client_max_body_size` in Nginx erhöhen (siehe Abschnitt 3). |
+| **CORS-Fehler lokal** | `.env` → `CORS_ORIGIN=http://localhost:4200` setzen. |
+| **Berechtigungen** | Ordner `storage/*` gehören dem Laufzeituser (`chown -R user:user storage`). |
+| **pdftoppm nicht gefunden** | `sudo apt install poppler-utils`. |
+| **sharp-Build schlägt fehl** | `libvips-dev` installieren und `npm rebuild sharp`. |
+| **SQLite locked** | Prozess beendet? PM2-Neustart (`pm2 restart manga-shelf-api`). |
+
+Logs:
+* Backend: `pm2 logs manga-shelf-api`
+* Frontend-Serve (optional): `pm2 logs manga-shelf-web`
+* Nginx: `/var/log/nginx/access.log`, `/var/log/nginx/error.log`
+
+## 13) Security-Hinweise
+
+* Repository **privat halten**, keine öffentlichen Uploads.
+* Starke Passwörter verwenden, Admin-Account nach Setup ändern.
+* Optional 2-Faktor (z. B. über zusätzliche Reverse-Proxy-Layer, VPN, Tailscale).
+* Regelmäßige Updates: `sudo apt upgrade`, `npm outdated` prüfen.
+* SQLite-Backups verschlüsseln (z. B. `gpg`), Server-Firewall aktivieren (`ufw allow 22 80 443`).
+
+## 14) Footer-Rechtstext
+
 > „Nur für eigene, legal erworbene Bücher/Mangas. Keine öffentliche Verbreitung.“
 
 ---
-- API: `/api/auth/login`, `/api/auth/me`, `/api/books/*` (Upload, List, Stream, Pages, Progress)
-- Mitgeliefert: `docs/nginx.example.conf`, `docs/godaddy-ddns/update.sh`, `.env.example`, `ecosystem.config.cjs`.
 
-## Quick‑Checklist (lokal testen)
-- `npm run dev` → Frontend http://localhost:4200, Backend http://localhost:3000
-- Login: `adminexample.com` / `ChangeThis123!`
-- Upload: kleine CBZ → Bibliothek zeigt Cover → Reader öffnet Bilder
-- PDF: Upload → `Reader` verlinkt Stream, Scrubber sichtbar
-- Progress: Seite wechseln → neu laden → Position bleibt
-- Theme: Toolbar „Theme ▾“ → Presets (Sakura Day/Night/Minimal) testen
-- Blossoms: Settings → Sakura/Blüten aktivieren, Dichte/Speed regeln
-- Night: Schalte auf Night (Sakura aus) → Starfield sichtbar, Sternen‑Dichte regeln
+### Weitere Ressourcen
 
-### Skripte (lokal)
-- Windows (PowerShell)
-  - Dev: `scripts/local-dev.ps1`
-  - Prod-like: `scripts/local-prod.ps1`
-- Linux/macOS (Bash)
-  - Dev: `scripts/local-dev.sh`
-  - Prod-like: `scripts/local-prod.sh`
+* **Nginx-Beispiel:** `docs/nginx.example.conf`
+* **DynDNS:** `docs/godaddy-ddns/update.sh`
+* **Backup-Skript:** `docs/backup.example.sh`
+* **PM2-Konfiguration:** `ecosystem.config.cjs`
+* **.env Vorlage:** `app/backend/.env.example`
 
-### Sample CBZ erzeugen
-- `node app/backend/scripts/make-sample-cbz.mjs` → erzeugt `sample.cbz` im Repo-Root.
+### Dev/Build-Skripte (Root `package.json`)
 
-## Night Theme & Effekte verifizieren
-1) In der Toolbar „Theme ▾“ → „Night“ wählen.
-2) Prüfe:
-   - Sternenhimmel aktiv (dezent, twinkling) und UI gut lesbar
-   - Karten/Toolbar im Dark‑Style, Links in ruhigem Blau
-3) Optional: deaktiviere Sternenhimmel per Toggle oder ändere Dichte.
-4) Wechsel auf „Sakura Day“ → Blüten sichtbar; Dichte/Speed in Settings steuerbar.
-5) Login/Upload: kurze Petal‑Bursts; in Settings Sound optional aktivierbar (lautstärke sehr niedrig).
+| Skript | Beschreibung |
+| --- | --- |
+| `npm run dev` | `ng serve` + `ts-node` via `concurrently` |
+| `npm run build` | `ng build --configuration production` + `tsc` |
+| `npm run start` | Startet Backend (`node app/backend/dist/main.js`) |
+| `npm run test` | Führt Backend-Tests (vitest) aus |
 
-## Admin
-- UI: Seite `/admin` (nur admin) zum Anlegen von Nutzern.
-- API Beispiele:
-```bash
-# Login
-curl -s http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -d '{"email":"adminexample.com","password":"ChangeThis123!"}'
-
-# Create user (admin JWT)
-curl -s http://localhost:3000/api/users \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"email":"friend3example.com","password":"ChangeThis123!","role":"reader"}'
-```
-- Audit: `/api/audit?limit=200` (nur admin) oder UI im Admin-Bereich; Log-Datei `storage/db/audit.log` (JSON Lines).
+Viel Spaß beim Lesen unter Kirschblüten! 🌸

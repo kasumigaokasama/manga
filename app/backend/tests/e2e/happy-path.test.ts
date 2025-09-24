@@ -22,7 +22,7 @@ describe('E2E happy path', () => {
   })
 
   it('login and list books', async () => {
-    const login = await request(app).post('/api/auth/login').send({ email: 'adminexample.com', password: 'ChangeThis123!' })
+    const login = await request(app).post('/api/auth/login').send({ email: 'admin@example.com', password: 'ChangeThis123!' })
     expect(login.status).toBe(200)
     expect(login.body.accessToken).toBeTruthy()
     const token = login.body.accessToken
@@ -30,10 +30,11 @@ describe('E2E happy path', () => {
     const list = await request(app).get('/api/books').set('Authorization', `Bearer ${token}`)
     expect(list.status).toBe(200)
     expect(Array.isArray(list.body.items)).toBe(true)
+    expect(list.body.pagination).toMatchObject({ page: 1 })
   })
 
   it('upload CBZ → cover + page accessible', async () => {
-    const login = await request(app).post('/api/auth/login').send({ email: 'adminexample.com', password: 'ChangeThis123!' })
+    const login = await request(app).post('/api/auth/login').send({ email: 'admin@example.com', password: 'ChangeThis123!' })
     const token = login.body.accessToken
 
     // Build a tiny CBZ buffer with 2 images
@@ -54,19 +55,20 @@ describe('E2E happy path', () => {
     expect(id).toBeTruthy()
 
     // Page 1 should be accessible
-    const pageRes = await request(app).get(`/api/books/${id}/pages/1`)
+    const pageRes = await request(app).get(`/api/books/${id}/pages/1`).set('Authorization', `Bearer ${token}`)
     expect(pageRes.status).toBe(200)
     expect(pageRes.headers['content-type']).toMatch(/image\/jpeg/)
 
     // Book metadata should show cover path and pageCount
-    const bookRes = await request(app).get(`/api/books/${id}`)
+    const bookRes = await request(app).get(`/api/books/${id}`).set('Authorization', `Bearer ${token}`)
     expect(bookRes.status).toBe(200)
     expect(bookRes.body.book.coverPath).toMatch(/\/thumbnails\//)
+    expect(bookRes.body.book.previewPath).toMatch(/\/previews\//)
     expect(bookRes.body.book.pageCount).toBeGreaterThanOrEqual(2)
   })
 
   it('upload PDF → range stream works', async () => {
-    const login = await request(app).post('/api/auth/login').send({ email: 'adminexample.com', password: 'ChangeThis123!' })
+    const login = await request(app).post('/api/auth/login').send({ email: 'admin@example.com', password: 'ChangeThis123!' })
     const token = login.body.accessToken
 
     // Generate minimal PDF
@@ -82,7 +84,7 @@ describe('E2E happy path', () => {
     expect(res.status).toBe(201)
     const id = res.body.id
 
-    const rangeRes = await request(app).get(`/api/books/${id}/stream`).set('Range', 'bytes=0-99')
+    const rangeRes = await request(app).get(`/api/books/${id}/stream`).set('Authorization', `Bearer ${token}`).set('Range', 'bytes=0-99')
     expect(rangeRes.status).toBe(206)
     expect(rangeRes.headers['content-range']).toMatch(/^bytes 0-99\//)
     expect(rangeRes.headers['content-type']).toBe('application/pdf')

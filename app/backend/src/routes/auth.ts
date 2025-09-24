@@ -9,8 +9,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret'
 const router = Router()
 
 const LoginSchema = z.object({
-  // Akzeptiert einfache Kennung wie 'adminexample.com' (kein echtes @ notwendig)
-  email: z.string().min(3),
+  // Erzwinge echte E-Mail-Adressen, alles wird intern in Kleinbuchstaben gespeichert.
+  email: z.string().email().transform((v) => v.toLowerCase()),
   password: z.string().min(6)
 })
 

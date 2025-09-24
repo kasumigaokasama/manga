@@ -21,7 +21,7 @@ import { BurstService } from '../services/burst.service'
   `
 })
 export class LoginPage {
-  email = 'adminexample.com'
+  email = 'admin@example.com'
   password = 'ChangeThis123!'
   constructor(private api: ApiService, private router: Router, private bursts: BurstService, private toast: ToastService) {}
   async submit() {

@@ -94,10 +94,26 @@ export async function migrateAndSeed() {
     await db
       .insertInto('users')
       .values([
-        { email: 'adminexample.com', passwordHash: adminHash, role: 'admin', createdAt: new Date().toISOString() },
-        { email: 'friend1example.com', passwordHash: friendHash, role: 'reader', createdAt: new Date().toISOString() },
-        { email: 'friend2example.com', passwordHash: friendHash, role: 'reader', createdAt: new Date().toISOString() }
+        {
+          email: 'admin@example.com',
+          passwordHash: adminHash,
+          role: 'admin',
+          createdAt: new Date().toISOString()
+        },
+        {
+          email: 'friend1@example.com',
+          passwordHash: friendHash,
+          role: 'reader',
+          createdAt: new Date().toISOString()
+        },
+        {
+          email: 'friend2@example.com',
+          passwordHash: friendHash,
+          role: 'reader',
+          createdAt: new Date().toISOString()
+        }
       ])
+      .onConflict((oc) => oc.column('email').doNothing())
       .execute()
   }
 }
