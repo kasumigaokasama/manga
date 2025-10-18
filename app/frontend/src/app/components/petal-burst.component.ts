@@ -20,7 +20,8 @@ export class PetalBurstComponent {
     const cy = at?.y ?? rect.height / 2
     for (let i = 0; i < count; i++) {
       const span = document.createElement('span')
-      span.textContent = ['🌸','💮','🌺'][Math.floor(Math.random()*3)]
+      // Use proper cherry blossom glyphs
+      span.textContent = ['🌸', '❀', '✿'][Math.floor(Math.random() * 3)]
       span.className = 'p'
       const dx = (Math.random() - 0.5) * 200
       const x = cx + (Math.random() - 0.5) * 40
@@ -30,7 +31,7 @@ export class PetalBurstComponent {
       span.style.setProperty('--x', '0px')
       span.style.setProperty('--y', '0px')
       span.style.setProperty('--dx', `${dx}px`)
-      span.style.animation = `floatUp ${800 + Math.random()*400}ms ease-out forwards`
+      span.style.animation = `floatUp ${800 + Math.random() * 400}ms ease-out forwards`
       this.layer.nativeElement.appendChild(span)
       setTimeout(() => span.remove(), 1200)
     }

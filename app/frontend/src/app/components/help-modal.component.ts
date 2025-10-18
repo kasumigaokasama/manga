@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { CommonModule } from '@angular/common'
 
 @Component({
   standalone: true,
   selector: 'app-help-modal',
+  imports: [CommonModule],
   styles: [`
     .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 60; }
     .panel { max-width: 720px; width: 90%; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.2) }

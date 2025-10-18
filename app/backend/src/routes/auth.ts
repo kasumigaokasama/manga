@@ -15,6 +15,12 @@ const LoginSchema = z.object({
 })
 
 router.post('/login', async (req, res) => {
+  // In production, require a strong JWT secret
+  if ((process.env.NODE_ENV || 'development') === 'production') {
+    if (!process.env.JWT_SECRET || String(process.env.JWT_SECRET).length < 32) {
+      return res.status(500).json({ error: 'Server misconfigured: weak JWT secret' })
+    }
+  }
   const parse = LoginSchema.safeParse(req.body)
   if (!parse.success) return res.status(400).json({ error: 'Invalid payload' })
   const { email, password } = parse.data
@@ -23,11 +29,35 @@ router.post('/login', async (req, res) => {
   const ok = await bcrypt.compare(password, user.passwordHash)
   if (!ok) return res.status(401).json({ error: 'Invalid credentials' })
   const accessToken = jwt.sign({ sub: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' })
+  // Also set an HttpOnly cookie for same-origin deployments
+  try {
+    const secure = (process.env.NODE_ENV || 'development') === 'production'
+    const cookie = [
+      `ms_token=${accessToken}`,
+      'Path=/',
+      'HttpOnly',
+      'SameSite=Lax',
+      secure ? 'Secure' : ''
+    ].filter(Boolean).join('; ')
+    res.setHeader('Set-Cookie', cookie)
+  } catch {}
+  const cookieOnly = ((process.env.AUTH_COOKIE_ONLY || '').toLowerCase() === '1' || (process.env.AUTH_COOKIE_ONLY || '').toLowerCase() === 'true')
+  const inProd = (process.env.NODE_ENV || 'development') === 'production'
+  if (cookieOnly && inProd) {
+    return res.json({ ok: true })
+  }
   res.json({ accessToken })
 })
 
 router.get('/me', authRequired(), async (req, res) => {
   res.json({ user: req.user })
+})
+
+router.post('/logout', async (_req, res) => {
+  const parts = ['ms_token=','Path=/','HttpOnly','SameSite=Lax','Max-Age=0']
+  if ((process.env.NODE_ENV || 'development') === 'production') parts.push('Secure')
+  res.setHeader('Set-Cookie', parts.join('; '))
+  res.json({ ok: true })
 })
 
 export default router

@@ -3,6 +3,11 @@ import { authGuard, roleGuard } from './auth.guard'
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'library' },
+  // New PDF-only reader route (assets-based MVP)
+  {
+    path: 'reader/:slug/:chapter',
+    loadComponent: () => import('./components/manga-reader.component').then(m => m.MangaReaderComponent)
+  },
   { path: 'login', loadComponent: () => import('./pages/login.page').then(m => m.LoginPage) },
   { path: 'library', canMatch: [authGuard], loadComponent: () => import('./pages/library.page').then(m => m.LibraryPage) },
   { path: 'upload', canMatch: [authGuard, roleGuard(['admin','editor'])], loadComponent: () => import('./pages/upload.page').then(m => m.UploadPage) },

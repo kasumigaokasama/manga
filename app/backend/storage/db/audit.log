@@ -2,3 +2,63 @@
 {"ts":"2025-09-24T20:30:24.003Z","event":"book_delete","userId":1,"bookId":1}
 {"ts":"2025-09-24T20:38:20.161Z","event":"book_upload","userId":1,"bookId":2,"title":"berserk","format":"pdf","language":"eng","tags":["action shonen"]}
 {"ts":"2025-09-24T20:40:36.623Z","event":"user_create","adminId":1,"userId":4,"email":"yusufkayaspam@gmail.com","role":"reader"}
+{"ts":"2025-09-28T17:14:09.771Z","event":"book_upload","userId":1,"bookId":3,"title":"test1","format":"pdf","language":"de","tags":["de"]}
+{"ts":"2025-09-28T18:16:07.567Z","event":"book_upload","userId":1,"bookId":4,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-09-28T18:16:07.682Z","event":"book_upload","userId":1,"bookId":6,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-09-28T18:16:08.223Z","event":"book_upload","userId":1,"bookId":7,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T11:22:37.591Z","event":"book_upload","userId":1,"bookId":8,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T11:22:37.705Z","event":"book_upload","userId":1,"bookId":10,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T11:22:37.805Z","event":"book_upload","userId":1,"bookId":11,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T11:27:52.069Z","event":"book_upload","userId":1,"bookId":12,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T11:27:52.133Z","event":"book_upload","userId":1,"bookId":13,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T11:27:52.167Z","event":"book_upload","userId":1,"bookId":14,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T11:27:52.258Z","event":"book_upload","userId":1,"bookId":15,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T11:53:42.555Z","event":"book_upload","userId":1,"bookId":16,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T11:53:42.622Z","event":"book_upload","userId":1,"bookId":17,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T11:53:42.653Z","event":"book_upload","userId":1,"bookId":18,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T11:53:42.747Z","event":"book_upload","userId":1,"bookId":19,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T12:04:01.846Z","event":"book_upload","userId":1,"bookId":20,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T12:04:01.892Z","event":"book_upload","userId":1,"bookId":21,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T12:04:01.945Z","event":"book_upload","userId":1,"bookId":22,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T12:04:02.017Z","event":"book_upload","userId":1,"bookId":23,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T16:32:19.107Z","event":"book_upload","userId":1,"bookId":24,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T16:32:19.151Z","event":"book_upload","userId":1,"bookId":25,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T16:32:19.207Z","event":"book_upload","userId":1,"bookId":26,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T16:32:19.290Z","event":"book_upload","userId":1,"bookId":27,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T16:49:40.346Z","event":"book_upload","userId":1,"bookId":28,"title":"Test PDF","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T16:51:38.076Z","event":"book_upload","userId":1,"bookId":29,"title":"test123","format":"pdf","language":"eng","tags":[]}
+{"ts":"2025-10-12T16:56:51.362Z","event":"book_upload","userId":1,"bookId":30,"title":"test123","format":"pdf","language":"eng","tags":["hi"]}
+{"ts":"2025-10-12T17:14:38.945Z","event":"book_upload","userId":1,"bookId":31,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:14:38.989Z","event":"book_upload","userId":1,"bookId":32,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T17:14:39.045Z","event":"book_upload","userId":1,"bookId":33,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:14:39.119Z","event":"book_upload","userId":1,"bookId":34,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T17:25:31.633Z","event":"book_upload","userId":1,"bookId":35,"title":"Sample PDF","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T17:36:01.334Z","event":"book_upload","userId":1,"bookId":36,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:36:01.383Z","event":"book_upload","userId":1,"bookId":37,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T17:36:01.434Z","event":"book_upload","userId":1,"bookId":38,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:36:01.512Z","event":"book_upload","userId":1,"bookId":39,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T17:38:40.590Z","event":"book_upload","userId":1,"bookId":40,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:38:40.639Z","event":"book_upload","userId":1,"bookId":41,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T17:38:40.690Z","event":"book_upload","userId":1,"bookId":42,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:38:40.767Z","event":"book_upload","userId":1,"bookId":43,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T17:42:31.546Z","event":"book_upload","userId":1,"bookId":44,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:42:31.610Z","event":"book_upload","userId":1,"bookId":45,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T17:42:31.644Z","event":"book_upload","userId":1,"bookId":46,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:42:31.736Z","event":"book_upload","userId":1,"bookId":47,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T17:48:28.546Z","event":"book_upload","userId":1,"bookId":48,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:48:28.595Z","event":"book_upload","userId":1,"bookId":49,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T17:48:28.645Z","event":"book_upload","userId":1,"bookId":50,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:48:28.725Z","event":"book_upload","userId":1,"bookId":51,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T17:52:53.151Z","event":"book_upload","userId":1,"bookId":52,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:52:53.206Z","event":"book_upload","userId":1,"bookId":53,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T17:52:53.250Z","event":"book_upload","userId":1,"bookId":54,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T17:52:53.332Z","event":"book_upload","userId":1,"bookId":55,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T18:42:25.864Z","event":"book_upload","userId":1,"bookId":56,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T18:42:25.908Z","event":"book_upload","userId":1,"bookId":57,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T18:42:25.965Z","event":"book_upload","userId":1,"bookId":58,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T18:42:26.037Z","event":"book_upload","userId":1,"bookId":59,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T19:16:24.804Z","event":"book_upload","userId":1,"bookId":60,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T19:16:24.865Z","event":"book_upload","userId":1,"bookId":61,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-10-12T19:16:24.913Z","event":"book_upload","userId":1,"bookId":62,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-10-12T19:16:24.998Z","event":"book_upload","userId":1,"bookId":63,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-10-12T19:20:49.725Z","event":"book_upload","userId":1,"bookId":64,"title":"bra","format":"pdf","language":"de","tags":[]}

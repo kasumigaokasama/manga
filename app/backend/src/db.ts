@@ -85,9 +85,9 @@ export async function migrateAndSeed() {
     .addColumn('updatedAt', 'text', (c) => c.notNull().defaultTo(new Date().toISOString()))
     .execute()
 
-  // Seed users if none
+  // Seed users if none (dev only)
   const userCount = await db.selectFrom('users').select((eb) => eb.fn.countAll().as('c')).executeTakeFirst()
-  if (!userCount || (userCount as any).c === 0) {
+  if ((process.env.NODE_ENV || 'development') !== 'production' && (!userCount || (userCount as any).c === 0)) {
     const bcrypt = await import('bcrypt')
     const adminHash = await bcrypt.hash('ChangeThis123!', 10)
     const friendHash = await bcrypt.hash('ChangeThis123!', 10)
@@ -115,6 +115,44 @@ export async function migrateAndSeed() {
       ])
       .onConflict((oc) => oc.column('email').doNothing())
       .execute()
+  }
+
+  // Dev convenience: if no books exist, auto-import sample.pdf from repo root (dev only)
+  try {
+    const bookCount = await db.selectFrom('books').select((eb) => eb.fn.countAll().as('c')).executeTakeFirst()
+    const hasNoBooks = !bookCount || (bookCount as any).c === 0
+    const repoRoot = path.resolve(process.cwd(), '..', '..')
+    const sampleSrc = path.join(repoRoot, 'sample.pdf')
+    if ((process.env.NODE_ENV || 'development') !== 'production' && hasNoBooks && fs.existsSync(sampleSrc)) {
+      // Copy into storage/originals with a safe unique name
+      let baseName = 'sample.pdf'
+      let dst = path.join(paths.originals, baseName)
+      let i = 1
+      while (fs.existsSync(dst)) {
+        baseName = `sample-${i++}.pdf`
+        dst = path.join(paths.originals, baseName)
+      }
+      fs.copyFileSync(sampleSrc, dst)
+      const now = new Date().toISOString()
+      await db
+        .insertInto('books')
+        .values({
+          title: 'Sample PDF',
+          author: null,
+          language: null,
+          format: 'pdf',
+          filePath: dst,
+          coverPath: null,
+          previewPath: null,
+          pageCount: null,
+          createdAt: now,
+          updatedAt: now,
+          deleted: 0
+        })
+        .execute()
+    }
+  } catch (e) {
+    // Best-effort; ignore any errors to avoid blocking startup in production
   }
 }
 

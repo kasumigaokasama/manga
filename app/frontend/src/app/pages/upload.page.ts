@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ApiService } from '../services/api.service'
+import { HapticsService } from '../services/haptics.service'
 import { BurstService } from '../services/burst.service'
 import { ToastService } from '../services/toast.service'
 
@@ -34,20 +35,14 @@ import { ToastService } from '../services/toast.service'
           <input id="tags" type="text" class="w-full border p-2 rounded" placeholder="Action, Romance" [(ngModel)]="tags" name="tags" />
         </div>
 
-        <div
-          class="border-2 border-dashed rounded-lg p-6 text-center transition"
-          [class.border-kurenai]="dragActive"
-          [class.bg-sakura]="dragActive"
-          (dragover)="onDragOver($event)"
-          (dragleave)="onDragLeave($event)"
-          (drop)="onDrop($event)"
-        >
-          <p class="mb-2">Datei hier ablegen oder auswaehlen</p>
-          <input type="file" class="w-full" (change)="onFile($event)" />
-          <p *ngIf="file" class="mt-2 text-sm text-gray-600">Ausgewaehlt: {{ file?.name }}</p>
+        <div class="space-y-2" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+          <label class="text-sm font-medium">Datei</label>
+          <input type="file" accept=".pdf,.epub,.cbz,.zip" (change)="onFile($event)" />
+          <p *ngIf="file" class="text-xs text-gray-500">Ausgewaehlt: {{ file?.name }}</p>
+          <div *ngIf="dragActive" class="text-xs text-gray-500">Datei hier ablegen…</div>
         </div>
 
-        <button class="bg-matcha text-white px-4 py-2 rounded w-full" [disabled]="busy">
+        <button class="bg-matcha text-white px-4 py-2 rounded w-full" [disabled]="busy" type="button" (click)="submit()">
           {{ busy ? 'Upload laeuft...' : 'Hochladen' }}
         </button>
       </form>
@@ -71,16 +66,19 @@ export class UploadPage {
   progress = 0
   dragActive = false
 
-  constructor(private api: ApiService, private bursts: BurstService, private toast: ToastService) {}
+  constructor(private api: ApiService, private bursts: BurstService, private toast: ToastService, private haptics: HapticsService) {}
 
   onFile(event: Event) {
     const files = (event.target as HTMLInputElement).files
     this.file = files && files.length ? files[0] : undefined
   }
 
+  // DevExtreme removed
+
   onDragOver(event: DragEvent) {
     event.preventDefault()
     this.dragActive = true
+    this.haptics.tap()
   }
 
   onDragLeave(event: DragEvent) {
@@ -93,6 +91,7 @@ export class UploadPage {
     this.dragActive = false
     if (event.dataTransfer?.files?.length) {
       this.file = event.dataTransfer.files[0]
+      this.haptics.tap()
     }
   }
 
@@ -114,10 +113,12 @@ export class UploadPage {
       this.bursts.trigger(16)
       await this.uploadWithProgress(form)
       this.bursts.trigger(24)
+      this.haptics.success()
       this.toast.show('Upload erfolgreich abgeschlossen', 'success')
       this.resetForm()
     } catch (err) {
       console.error(err)
+      this.haptics.error()
       this.toast.show('Fehler beim Upload', 'error')
     } finally {
       this.busy = false
@@ -159,4 +160,3 @@ export class UploadPage {
     })
   }
 }
-

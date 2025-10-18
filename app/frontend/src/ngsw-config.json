@@ -30,6 +30,29 @@
   ],
   "dataGroups": [
     {
+      "name": "pages",
+      "urls": [
+        "/api/books/*/pages/*"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 200,
+        "maxAge": "7d"
+      }
+    },
+    {
+      "name": "covers",
+      "urls": [
+        "/thumbnails/**",
+        "/previews/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 200,
+        "maxAge": "30d"
+      }
+    },
+    {
       "name": "api",
       "urls": [
         "/api/**"
@@ -43,4 +66,3 @@
     }
   ]
 }
-

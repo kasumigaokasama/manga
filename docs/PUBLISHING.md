@@ -6,7 +6,7 @@ Prerequisites
 
 - Ubuntu 24.04 server with sudo access
 - Domain name pointing at the server (A records)
-- Email address for Let’s Encrypt
+- Email address for Let's Encrypt
 
 Install base packages
 
@@ -31,7 +31,12 @@ git clone <REPO_URL> manga-shelf
 cd manga-shelf
 nvm use              # picks Node 20 per .nvmrc
 cp app/backend/.env.example app/backend/.env
-# Edit app/backend/.env: set JWT_SECRET, CORS_ORIGIN=https://your-domain.tld
+# Edit app/backend/.env
+# - Set NODE_ENV=production
+# - Set JWT_SECRET to a long random value (>=32 chars)
+# - Set CORS_ORIGIN=https://your-domain.tld
+# - Optionally enable cookie-only auth in production:
+#   AUTH_COOKIE_ONLY=1   # requires HttpOnly cookie `ms_token`, ignores Authorization header
 
 npm i
 npm run build        # builds API + Angular
@@ -56,7 +61,7 @@ sudo ln -s /etc/nginx/sites-available/manga-shelf /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-TLS (Let’s Encrypt)
+TLS (Let's Encrypt)
 
 ```
 sudo snap install core; sudo snap refresh core
@@ -66,7 +71,7 @@ sudo certbot --nginx -d your-domain.tld -d www.your-domain.tld
 sudo systemctl reload nginx
 ```
 
-Post‑deploy checks
+Post-deploy checks
 
 - https://your-domain.tld opens the Angular app
 - Login with admin@example.com / ChangeThis123! (change afterwards)
@@ -74,7 +79,7 @@ Post‑deploy checks
   - Covers/previews appear
   - Reader opens
   - EPUB uses download via /api/books/:id/download
-- API health: https://your-domain.tld/api/health → { ok: true }
+- API health: https://your-domain.tld/api/health -> { ok: true }
 
 Operations
 
@@ -91,6 +96,6 @@ Operations
 Security
 
 - Keep repo private; rotate default admin credentials
-- Use strong `JWT_SECRET` in .env
-- Limit exposure (VPN/allow‑list), consider Basic Auth on Nginx for an extra layer
-
+- Use strong `JWT_SECRET` in .env; server refuses weak secrets in production
+- Consider enabling cookie-only auth (AUTH_COOKIE_ONLY=1) for production same-origin deployments
+- Limit exposure (VPN/allow-list), consider Basic Auth on Nginx for an extra layer

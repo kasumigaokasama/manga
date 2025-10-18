@@ -1,37 +1,37 @@
 {
-    "name": "manga-shelf-frontend",
-    "version": "1.0.0",
-    "private": true,
-    "scripts": {
-        "dev": "ng serve --port 4200",
-        "build": "ng build --configuration production"
-    },
-    "dependencies": {
-        "@angular/animations": "^20.0.0",
-        "@angular/cdk": "^20.0.0",
-        "@angular/common": "^20.0.0",
-        "@angular/compiler": "^20.0.0",
-        "@angular/core": "^20.0.0",
-        "@angular/forms": "^20.0.0",
-        "@angular/material": "^20.0.0",
-        "@angular/platform-browser": "^20.0.0",
-        "@angular/platform-browser-dynamic": "^20.0.0",
-        "@angular/router": "^20.0.0",
-        "@angular/service-worker": "^20.0.0",
-        "pdfjs-dist": "^4.5.136",
-        "rxjs": "^7.8.1",
-        "tailwindcss": "^3.4.10",
-        "zone.js": "^0.14.4"
-    },
-    "devDependencies": {
-        "@angular-devkit/build-angular": "^20.0.0",
-        "@angular/cli": "^20.0.0",
-        "@angular/compiler-cli": "^20.0.0",
-        "autoprefixer": "^10.4.20",
-        "postcss": "^8.4.41",
-        "typescript": "~5.5.4"
-    },
-    "engines": {
-        "node": ">=20 <21"
-    }
+    "name":  "manga-shelf-frontend",
+    "version":  "1.0.0",
+    "private":  true,
+    "scripts":  {
+                    "dev":  "ng serve --port 4200",
+                    "build":  "ng build --configuration production"
+                },
+    "dependencies":  {
+                         "@angular/animations":  "^20.0.0",
+                         "@angular/cdk":  "^20.0.0",
+                         "@angular/common":  "^20.0.0",
+                         "@angular/compiler":  "^20.0.0",
+                         "@angular/core":  "^20.0.0",
+                         "@angular/forms":  "^20.0.0",
+                         "@angular/material":  "^20.0.0",
+                         "@angular/platform-browser":  "^20.0.0",
+                         "@angular/platform-browser-dynamic":  "^20.0.0",
+                         "@angular/router":  "^20.0.0",
+                         "@angular/service-worker":  "^20.0.0",
+                         "pdfjs-dist":  "^4.5.136",
+                         "rxjs":  "^7.8.1",
+                         "tailwindcss":  "^3.4.10",
+                         "zone.js":  "^0.14.4"
+                     },
+    "devDependencies":  {
+                            "@angular-devkit/build-angular":  "^20.0.0",
+                            "@angular/cli":  "^20.0.0",
+                            "@angular/compiler-cli":  "^20.0.0",
+                            "autoprefixer":  "^10.4.20",
+                            "postcss":  "^8.4.41",
+                            "typescript":  "~5.5.4"
+                        },
+    "engines":  {
+                    "node":  "\u003e=20 \u003c21"
+                }
 }

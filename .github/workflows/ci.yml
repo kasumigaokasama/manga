@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install workspace deps
+        run: npm ci
+      - name: Backend build + tests
+        run: |
+          npm run build -w app/backend
+          npm test -w app/backend
+      - name: Frontend build
+        run: npm run build -w app/frontend

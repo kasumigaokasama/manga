@@ -12,6 +12,13 @@
 
 body {
   font-family: 'Noto Sans JP', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Improve keyboard focus visibility */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .sakura-bg {
@@ -48,3 +55,35 @@ header a.font-bold { display: inline-block; animation: sakura-wobble 6s ease-in-
 
 /* Night tweaks for blossoms to be subtler over dark */
 .theme-dark app-blossoms { opacity: 0.8; }
+
+/* Action buttons: render icon via Material Icons and hide stray text */
+button[title="Mehr Optionen"] { font-size: 0; }
+button[title="Mehr Optionen"]::before {
+  content: 'more_horiz';
+  font-family: 'Material Icons';
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Reader centering and mobile fit */
+.reader-pdf canvas { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.reader-images img { max-width: 100%; height: auto; }
+.tap-zone { position: absolute; top: 0; bottom: 0; width: 50%; pointer-events: auto; }
+.tap-zone.left { left: 0; }
+.tap-zone.right { right: 0; }
+
+/* iPhone safe area padding for bottom controls */
+@supports (padding: max(0px)) {
+  .safe-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+/* Larger touch targets on coarse pointers (mobile) */
+@media (pointer: coarse) {
+  .card [title="Benutzer loeschen"], .card [title="Passwort setzen"],
+  .card [title="Original herunterladen"], .card [title="Mehr Optionen"] {
+    padding: 10px 12px;
+    min-width: 44px; min-height: 44px;
+  }
+}
+/* DevExtreme removed */

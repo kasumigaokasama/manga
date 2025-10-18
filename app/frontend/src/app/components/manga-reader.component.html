@@ -1,0 +1,30 @@
+<app-reader-toolbar
+  [title]="ref?.title || ''"
+  [page]="page()"
+  [totalPages]="total()"
+  [spread]="spread()"
+  [rtl]="rtl()"
+  [zoomPercent]="zoomPercent()"
+  (toggleSpread)="toggleSpread()"
+  (toggleRtl)="toggleRtl()"
+  (zoomIn)="zoomIn()"
+  (zoomOut)="zoomOut()"
+  (prev)="prev()"
+  (next)="next()"
+></app-reader-toolbar>
+
+<div class="reader" [class.rtl]="rtl()">
+  <div class="spread" *ngIf="spread(); else single" aria-label="Spread">
+    <canvas #canvasLeft class="page" aria-label="Seite links"></canvas>
+    <canvas #canvasRight class="page" aria-label="Seite rechts"></canvas>
+  </div>
+  <ng-template #single>
+    <canvas #canvasLeft class="page" aria-label="Seite"></canvas>
+  </ng-template>
+</div>
+
+<app-thumbnail-strip
+  [pages]="total() ? getPagesArray(total()) : []"
+  [current]="page()"
+  (jump)="setPage($event)"
+></app-thumbnail-strip>

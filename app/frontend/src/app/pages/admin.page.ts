@@ -40,13 +40,24 @@ import { ApiService, AdminUser } from '../services/api.service'
                 </td>
                 <td>{{ u.createdAt | date:'short' }}</td>
                 <td>
-                  <button class="bg-gray-200 rounded px-3 py-1 mr-2" (click)="setPassword(u)">Passwort</button>
-                  <button class="bg-kurenai text-white rounded px-3 py-1" (click)="remove(u)">Loeschen</button>
+                  <button class="bg-gray-200 rounded px-3 py-1 mr-2" (click)="setPassword(u)" title="Passwort setzen" aria-label="Passwort setzen">
+                    <span class="material-icons" aria-hidden="true">lock_reset</span>
+                  </button>
+                  <button class="bg-kurenai text-white rounded px-3 py-1" (click)="remove(u)" title="Benutzer loeschen" aria-label="Benutzer loeschen">
+                    <span class="material-icons" aria-hidden="true">delete</span>
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div class="card">
+        <h2 class="font-bold mb-2">Wartung</h2>
+        <button class="bg-gray-200 rounded px-3 py-1 mr-2" (click)="heal()" title="Bibliothek reparieren (Formate/Cover)" aria-label="Bibliothek reparieren">
+          <span class="material-icons" aria-hidden="true">build</span>
+        </button>
       </div>
 
       <div class="card">
@@ -90,10 +101,18 @@ export class AdminPage implements OnInit {
     } catch { alert('Loeschen fehlgeschlagen') }
   }
   async setPassword(u: AdminUser) {
-    const p = prompt(`Neues Passwort für ${u.email}:`)
+    const p = prompt(`Neues Passwort fǬr ${u.email}:`)
     if (!p) return
     try { await this.api.adminSetPassword(u.id, p); alert('Passwort gesetzt') } catch { alert('Fehlgeschlagen') }
   }
+  async heal() {
+    try {
+      const { fixed } = await this.api.adminHealLibrary()
+      alert('Wartung abgeschlossen. Aktualisierte Eintraege: ' + fixed)
+      await this.load()
+    } catch {
+      alert('Wartung fehlgeschlagen')
+    }
+  }
 }
-
 

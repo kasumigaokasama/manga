@@ -15,10 +15,9 @@ import { ToastService } from '../services/toast.service'
     @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 8px) } to { opacity: 1; transform: translate(-50%, 0) } }
   `],
   template: `
-    <div *ngFor="let t of toast.toasts()" class="toast" [ngClass]="t.type">{{ t.text }}</div>
+    <div *ngFor="let t of toast.toasts()" class="toast" [ngClass]="t.type" role="status" aria-live="polite">{{ t.text }}</div>
   `
 })
 export class ToastContainerComponent {
   constructor(public toast: ToastService) {}
 }
-

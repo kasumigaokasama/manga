@@ -1,11 +1,22 @@
 # Root
 node_modules/
 dist/
+app/frontend/dist/
+app/backend/dist/
 .env
+app/backend/.env
 .DS_Store
 .idea/
 .vscode/
 coverage/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Angular/CLI cache
+.angular/
+app/frontend/.angular/
 
 # Storage runtime data (kept outside VCS)
 storage/originals/
@@ -15,6 +26,22 @@ storage/previews/
 storage/db/*.db
 storage/db/*.sqlite
 storage/db/*.sqlite3
+storage/db/*.db-shm
+storage/db/*.db-wal
+storage/db/*.sqlite-shm
+storage/db/*.sqlite-wal
 storage/**/*.tmp
 storage/**/.cache
 
+# Dev logs and temp files
+dev*.log
+*.pid
+*.bak
+*.bak2
+
+# OS/editor cruft
+*.swp
+*.swo
+*.lock
+Thumbs.db
+ehthumbs.db

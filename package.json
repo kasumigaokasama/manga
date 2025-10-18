@@ -2,12 +2,13 @@
   "name": "manga-shelf",
   "private": true,
   "version": "1.0.0",
-  "description": "Private Bücher/Manga-Regal – Angular v20 + Node 20/Express + TypeScript",
+  "description": "Private books/manga shelf - Angular 20 + Node 20/Express + TypeScript",
   "workspaces": [
     "app/*"
   ],
   "scripts": {
     "dev": "concurrently -n api,web -c green,magenta \"npm run dev -w app/backend\" \"npm run dev -w app/frontend\"",
+    "dev:win": "concurrently -n api,web -c green,magenta \"cross-env-shell PORT=3001 npm run dev -w app/backend\" \"npm exec -w app/frontend -- ng serve --port 4300\"",
     "build": "npm run build -w app/frontend && npm run build -w app/backend",
     "start": "node app/backend/dist/main.js",
     "test": "npm run test -w app/backend",
@@ -15,7 +16,8 @@
     "test:e2e": "npm run test:e2e -w app/backend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3"
   },
   "overrides": {
     "esbuild": "0.21.5"

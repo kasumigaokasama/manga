@@ -1,9 +1,11 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core'
+import { CommonModule } from '@angular/common'
 
 @Component({
   standalone: true,
   selector: 'app-blossoms',
-  template: `<canvas #c class="fixed inset-0 pointer-events-none" style="z-index:9999" *ngIf="enabled"></canvas>`
+  imports: [CommonModule],
+  template: `<canvas #c class="fixed inset-0 pointer-events-none" style="z-index:3" *ngIf="enabled"></canvas>`
 })
 export class BlossomsComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() enabled = false
@@ -26,10 +28,15 @@ export class BlossomsComponent implements AfterViewInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('enabled' in changes) {
-      if (!this.enabled) { this.destroy() } else { this.initIfNeeded(true) }
+      if (!this.enabled) {
+        this.destroy()
+      } else {
+        // Defer init to next tick so the canvas created by *ngIf exists
+        queueMicrotask(() => this.initIfNeeded(true))
+      }
     }
     if ((changes['density'] || changes['speed']) && this.enabled) {
-      this.initIfNeeded(true)
+        queueMicrotask(() => this.initIfNeeded(true))
     }
   }
 

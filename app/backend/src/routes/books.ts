@@ -93,13 +93,47 @@ router.get('/languages', authRequired(), async (_req, res) => {
 router.get('/:id', authRequired(), async (req, res) => {
   const id = Number(req.params.id)
   if (!Number.isFinite(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' })
-  const book = await db
+  let book = await db
     .selectFrom('books')
     .selectAll()
     .where('id', '=', id)
     .where('deleted', '=', 0)
     .executeTakeFirst()
   if (!book) return res.status(404).json({ error: 'Not found' })
+
+  // Auto-heal: if file is actually a PDF but format was misdetected, fix it on read.
+  try {
+    const file = book.filePath
+    if (fs.existsSync(file)) {
+      const fd = fs.openSync(file, 'r')
+      const buf = Buffer.alloc(4)
+      fs.readSync(fd, buf, 0, 4, 0)
+      fs.closeSync(fd)
+      const isPdf = buf.toString() === '%PDF'
+      if (isPdf && book.format !== 'pdf') {
+        const updates: Record<string, any> = { format: 'pdf', updatedAt: new Date().toISOString() }
+        // Try to set pageCount via pdf-lib
+        try {
+          const pdfBytes = fs.readFileSync(file)
+          const pdfDoc = await PDFDocument.load(pdfBytes)
+          updates.pageCount = pdfDoc.getPageCount()
+        } catch {}
+        await db.updateTable('books').set(updates).where('id', '=', id).execute()
+        book = { ...book, ...updates }
+      }
+      // If still no cover, create a placeholder so the UI shows a cover
+      if (!book.coverPath) {
+        try {
+          await generatePlaceholderCover(id)
+          const coverPath = `/thumbnails/${id}.jpg`
+          const previewPath = `/previews/${id}.jpg`
+          await db.updateTable('books').set({ coverPath, previewPath, updatedAt: new Date().toISOString() }).where('id', '=', id).execute()
+          book.coverPath = coverPath
+          book.previewPath = previewPath
+        } catch {}
+      }
+    }
+  } catch {}
   const tags = await db
     .selectFrom('book_tags as bt')
     .innerJoin('tags as t', 't.id', 'bt.tagId')
@@ -245,7 +279,9 @@ const UploadSchema = z.object({
 function adminTokenOrRole(roles: Role[]) {
   const adminToken = process.env.ADMIN_TOKEN
   return (req: any, res: any, next: any) => {
-    if (adminToken && req.headers['x-admin-token'] === adminToken) {
+    const tok = req.headers['x-admin-token']
+    const strong = typeof adminToken === 'string' && adminToken.length >= 32
+    if (strong && tok === adminToken) {
       req.user = { sub: 0, email: 'admin-token', role: 'admin' }
       return next()
     }
@@ -261,9 +297,9 @@ router.post('/upload', adminTokenOrRole(['admin', 'editor']), upload.single('fil
   const filePath = path.join(paths.originals, req.file.filename)
   const ext = path.extname(req.file.originalname).toLowerCase()
   let format: 'pdf' | 'epub' | 'cbz' | 'images' = 'images'
-  if (['.pdf'].includes(ext)) format = 'pdf'
-  else if (['.epub'].includes(ext)) format = 'epub'
-  else if (['.cbz', '.zip'].includes(ext)) format = 'cbz'
+  if (ext === '.pdf') format = 'pdf'
+  else if (ext === '.epub') format = 'epub'
+  else if (ext === '.cbz' || ext === '.zip') format = 'cbz'
 
   // Magic-byte validation (basic)
   try {
@@ -273,8 +309,11 @@ router.post('/upload', adminTokenOrRole(['admin', 'editor']), upload.single('fil
     fs.closeSync(fd)
     const isPdf = buf.slice(0, 4).toString() === '%PDF'
     const isZip = buf[0] === 0x50 && buf[1] === 0x4b
+    // Override by magic: if it's a real PDF, treat it as PDF regardless of extension
+    if (isPdf) format = 'pdf'
+    // Validate by format
     if (format === 'pdf' && !isPdf) throw new Error('Not a PDF file')
-    if ((format === 'cbz' || format === 'images' || format === 'epub') && !(isZip || format === 'images')) {
+    if ((format === 'cbz' || format === 'images' || format === 'epub') && !isZip) {
       throw new Error('Expected ZIP-based container')
     }
   } catch (e: any) {
@@ -418,28 +457,72 @@ router.delete('/:id', adminTokenOrRole(['admin']), async (req, res) => {
   res.json({ ok: true })
 })
 
+// Admin maintenance: heal library (fix misdetected PDFs, ensure covers)
+router.post('/heal', adminTokenOrRole(['admin']), async (_req, res) => {
+  const books = await db.selectFrom('books').selectAll().where('deleted', '=', 0).execute()
+  let fixed = 0
+  for (const b of books as any[]) {
+    try {
+      if (!fs.existsSync(b.filePath)) continue
+      const fd = fs.openSync(b.filePath, 'r')
+      const buf = Buffer.alloc(4)
+      fs.readSync(fd, buf, 0, 4, 0)
+      fs.closeSync(fd)
+      const isPdf = buf.toString() === '%PDF'
+      const updates: Record<string, any> = {}
+      if (isPdf && b.format !== 'pdf') {
+        updates.format = 'pdf'
+        try {
+          const pdfBytes = fs.readFileSync(b.filePath)
+          const pdfDoc = await PDFDocument.load(pdfBytes)
+          updates.pageCount = pdfDoc.getPageCount()
+        } catch {}
+      }
+      if (!b.coverPath) {
+        try {
+          await generatePlaceholderCover(b.id)
+          updates.coverPath = `/thumbnails/${b.id}.jpg`
+          updates.previewPath = `/previews/${b.id}.jpg`
+        } catch {}
+      }
+      if (Object.keys(updates).length) {
+        updates.updatedAt = new Date().toISOString()
+        await db.updateTable('books').set(updates).where('id', '=', b.id).execute()
+        fixed++
+      }
+    } catch {}
+  }
+  res.json({ ok: true, fixed })
+})
+
 async function extractCbzToPages(zipPath: string, bookId: number) {
   const outDir = path.join(paths.pages, String(bookId))
   fs.rmSync(outDir, { recursive: true, force: true })
   fs.mkdirSync(outDir, { recursive: true })
 
-  await fs.createReadStream(zipPath).pipe(unzipper.Extract({ path: outDir })).promise()
-
-  const files = collectImagesRecursive(outDir)
+  // Safely read zip entries without extracting arbitrary paths
+  const opened = await (unzipper as any).Open.file(zipPath)
+  const entries = opened.files.filter((f: any) => !f.type || f.type === 'File')
+  // Only accept image-like names
+  const imageEntries = entries.filter((f: any) => /\.(jpe?g|png|webp)$/i.test(path.basename(f.path)))
   const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
-  files.sort((a, b) => collator.compare(path.basename(a), path.basename(b)))
+  imageEntries.sort((a: any, b: any) => collator.compare(path.basename(a.path), path.basename(b.path)))
 
   let index = 1
   let firstProcessedPath: string | null = null
-  for (const src of files) {
+  const maxEnv = Number(process.env.MAX_PAGES_PER_BOOK || '2000')
+  const maxPages = Number.isFinite(maxEnv) && maxEnv > 0 ? Math.min(Math.floor(maxEnv), 10000) : 2000
+  for (const ent of imageEntries) {
+    if (index > maxPages) break
+    const buf = await ent.buffer()
     const dst = path.join(outDir, `${index}.jpg`)
-    await sharp(src).jpeg({ quality: 78, progressive: true }).toFile(dst)
+    await sharp(buf).jpeg({ quality: 78, progressive: true }).toFile(dst)
     if (!firstProcessedPath) firstProcessedPath = dst
-    if (src !== dst && fs.existsSync(src)) fs.unlinkSync(src)
     index++
   }
 
-  const updates: Record<string, any> = { pageCount: Math.max(0, index - 1) }
+  const count = Math.max(0, index - 1)
+  const updates: Record<string, any> = { pageCount: count }
   if (firstProcessedPath) {
     Object.assign(updates, await generateThumbnails(firstProcessedPath, bookId))
   }
@@ -465,10 +548,49 @@ async function processPdf(filePath: string, bookId: number) {
       fs.unlinkSync(jpg)
     }
   } catch (err) {
-    console.warn('pdftoppm not available, skipping PDF preview generation', err)
+    console.warn('pdftoppm not available, attempting sharp() PDF render')
+    try {
+      // Try to rasterize first PDF page via sharp (requires libvips with pdfium)
+      const tmpJpg = path.join(paths.previews, `pdf-first-${bookId}.jpg`)
+      await sharp(filePath, { density: 150, page: 0 }).jpeg({ quality: 85 }).toFile(tmpJpg)
+      if (fs.existsSync(tmpJpg)) {
+        Object.assign(updates, await generateThumbnails(tmpJpg, bookId))
+        fs.unlinkSync(tmpJpg)
+      }
+    } catch (e2) {
+      console.warn('sharp PDF render not available, generating placeholder cover instead')
+      try {
+        await generatePlaceholderCover(bookId)
+        updates.coverPath = `/thumbnails/${bookId}.jpg`
+        updates.previewPath = `/previews/${bookId}.jpg`
+      } catch (e3) {
+        console.warn('Placeholder cover generation failed:', e3)
+      }
+    }
   }
 
   return updates
+}
+
+async function generatePlaceholderCover(bookId: number) {
+  const w = 768, h = 1152
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+  <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+    <defs>
+      <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#F9D5E5"/>
+        <stop offset="100%" stop-color="#ffffff"/>
+      </linearGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#g)"/>
+    <text x="50%" y="45%" font-family="Arial, Helvetica, sans-serif" font-size="180" fill="#0F2D5C" text-anchor="middle">PDF</text>
+    <text x="50%" y="58%" font-family="Arial, Helvetica, sans-serif" font-size="48" fill="#0F2D5C" text-anchor="middle">Manga Shelf</text>
+  </svg>`
+  const buf = Buffer.from(svg)
+  const previewJpg = path.join(paths.previews, `${bookId}.jpg`)
+  const thumbJpg = path.join(paths.thumbnails, `${bookId}.jpg`)
+  await sharp(buf).jpeg({ quality: 85 }).toFile(previewJpg)
+  await sharp(previewJpg).resize(256, 384, { fit: 'cover' }).jpeg({ quality: 78, progressive: true }).toFile(thumbJpg)
 }
 
 async function extractEpubMetaAndCover(epubPath: string, bookId: number): Promise<{

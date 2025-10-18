@@ -13,25 +13,35 @@ declare global {
 }
 
 function extractToken(req: Request): string | null {
+  const cookieOnly = ((process.env.AUTH_COOKIE_ONLY || '').toLowerCase() === '1' || (process.env.AUTH_COOKIE_ONLY || '').toLowerCase() === 'true')
+  const inProd = (process.env.NODE_ENV || 'development') === 'production'
+  const cookie = req.headers['cookie']
+  const readCookie = () => {
+    if (typeof cookie === 'string') {
+      const parts = cookie.split(';')
+      for (const p of parts) {
+        const [k, v] = p.trim().split('=')
+        if (k === 'ms_token' && v) return decodeURIComponent(v)
+      }
+    }
+    return null
+  }
+  if (cookieOnly && inProd) {
+    return readCookie()
+  }
   const auth = req.headers.authorization
-  if (auth?.startsWith('Bearer ')) {
-    return auth.slice(7)
-  }
-  const altHeader = req.headers['x-access-token']
-  if (typeof altHeader === 'string') {
-    return altHeader
-  }
-  const qToken = (req.query?.token ?? req.query?.access_token) as unknown
-  if (Array.isArray(qToken)) {
-    return qToken[0] ?? null
-  }
-  if (typeof qToken === 'string') {
-    // Verhindere, dass die Token-Query später weitergereicht wird
-    delete (req.query as any).token
-    delete (req.query as any).access_token
-    return qToken
-  }
-  return null
+  if (auth?.startsWith('Bearer ')) return auth.slice(7)
+  // Limited support for token in query for PDF/image streaming routes to improve cross-origin compatibility in dev
+  try {
+    const p = req.path || ''
+    const isStream = /^\/api\/books\/\d+\/(stream|pages\/)/.test(p)
+    if (isStream) {
+      const q: any = req.query || {}
+      const t = (q.token || q.access_token) as string | undefined
+      if (t && typeof t === 'string') return t
+    }
+  } catch {}
+  return readCookie()
 }
 
 export function authRequired(roles?: Role[]) {

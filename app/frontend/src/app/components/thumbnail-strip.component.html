@@ -1,0 +1,6 @@
+<div class="thumbs" role="navigation" aria-label="Seitenübersicht">
+  <button *ngFor="let n of pages" class="thumb" [class.active]="n===current" (click)="jump.emit(n)" aria-label="Seite {{n}}">
+    <span>{{ n }}</span>
+  </button>
+</div>
+

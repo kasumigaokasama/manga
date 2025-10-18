@@ -1,12 +1,20 @@
 import { inject } from '@angular/core'
-import { CanMatchFn, Router } from '@angular/router'
+import { CanMatchFn, Router, UrlSegment } from '@angular/router'
 import { ApiService } from './services/api.service'
 
-export const authGuard: CanMatchFn = () => {
+export const authGuard: CanMatchFn = async (_route, segments: UrlSegment[]) => {
   const api = inject(ApiService)
   const router = inject(Router)
-  if (!api.token()) { router.navigateByUrl('/login'); return false }
-  return true
+  // If we already have a user, allow
+  if (api.isAuthenticated()) return true
+  // If we have a header token, allow optimistically
+  if (api.isTokenValid()) return true
+  // Try to refresh session (cookie or header)
+  try { await api.refreshMe() } catch {}
+  if (api.isAuthenticated()) return true
+  const attempted = '/' + segments.map(s => s.path).join('/')
+  router.navigateByUrl(`/login?returnUrl=${encodeURIComponent(attempted || '/library')}`)
+  return false
 }
 
 export function roleGuard(roles: Array<'admin'|'editor'|'reader'>): CanMatchFn {
@@ -18,4 +26,3 @@ export function roleGuard(roles: Array<'admin'|'editor'|'reader'>): CanMatchFn {
     return true
   }
 }
-

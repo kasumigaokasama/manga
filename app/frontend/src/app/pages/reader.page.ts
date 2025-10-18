@@ -7,8 +7,7 @@ import { SettingsService } from '../services/settings.service'
 import { ThemeService } from '../services/theme.service'
 import { GlobalWorkerOptions, getDocument, type PDFDocumentProxy } from 'pdfjs-dist'
 
-const workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url)
-GlobalWorkerOptions.workerSrc = workerSrc.toString()
+GlobalWorkerOptions.workerSrc = '/assets/pdf.worker.min.mjs'
 
 @Component({
   standalone: true,

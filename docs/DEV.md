@@ -1,4 +1,4 @@
-Developer Setup
+﻿Developer Setup
 
 Quick notes to get the repo running locally across common environments.
 
@@ -44,4 +44,19 @@ Notes
 - The backend uses SQLite via `better-sqlite3`; it attempts to use prebuilt binaries, but will fall back to a local build.
 - If you upgrade Node beyond 20, ensure your environment can compile native addons or that prebuilt binaries are available for your Node version.
 - Storage directories are created on API start under `storage/` (or `STORAGE_DIR`).
+
+
+Windows quick start:
+
+``
+# in repo root
+npm i
+copy app\backend\.env.example app\backend\.env
+npm run dev:win   # API :3001, Web :4300
+``
+
+
+Notes on PDFs:
+- Viewer uses PDF.js with HTTP range streaming. No file download needed; works behind CORS. We expose Accept-Ranges/Content-Range headers in CORS (see backend app.ts).
+- If covers fail on Linux, install poppler-utils for pdftoppm (optional). Reading works regardless.
 
