@@ -43,7 +43,7 @@ import { ApiService, AdminUser } from '../services/api.service'
                   <button class="bg-gray-200 rounded px-3 py-1 mr-2" (click)="setPassword(u)" title="Passwort setzen" aria-label="Passwort setzen">
                     <span class="material-icons" aria-hidden="true">lock_reset</span>
                   </button>
-                  <button class="bg-kurenai text-white rounded px-3 py-1" (click)="remove(u)" title="Benutzer loeschen" aria-label="Benutzer loeschen">
+                  <button class="bg-kurenai text-white rounded px-3 py-1" (click)="remove(u)" title="Benutzer löschen" aria-label="Benutzer löschen">
                     <span class="material-icons" aria-hidden="true">delete</span>
                   </button>
                 </td>
@@ -73,9 +73,9 @@ export class AdminPage implements OnInit {
   audit = signal<any[]>([])
   email = ''
   password = ''
-  role: 'admin'|'editor'|'reader' = 'reader'
+  role: 'admin' | 'editor' | 'reader' = 'reader'
   private auditTimer: any
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
   async ngOnInit() { await this.load(); await this.loadAudit(); this.auditTimer = setInterval(() => this.loadAudit(), 5000) }
   ngOnDestroy() { if (this.auditTimer) clearInterval(this.auditTimer) }
   async load() { try { this.users.set(await this.api.adminListUsers()) } catch { alert('Nicht berechtigt') } }
@@ -87,28 +87,28 @@ export class AdminPage implements OnInit {
       await this.load()
     } catch { alert('Erstellen fehlgeschlagen') }
   }
-  async updateRole(u: AdminUser, role: 'admin'|'editor'|'reader') {
+  async updateRole(u: AdminUser, role: 'admin' | 'editor' | 'reader') {
     try {
       await fetch(`${this.api.base}/api/users/${u.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.api.token()}` }, body: JSON.stringify({ role }) })
       await this.load()
     } catch { alert('Update fehlgeschlagen') }
   }
   async remove(u: AdminUser) {
-    if (!confirm(`Benutzer ${u.email} loeschen?`)) return
+    if (!confirm(`Benutzer ${u.email} löschen?`)) return
     try {
       await fetch(`${this.api.base}/api/users/${u.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${this.api.token()}` } })
       await this.load()
-    } catch { alert('Loeschen fehlgeschlagen') }
+    } catch { alert('Löschen fehlgeschlagen') }
   }
   async setPassword(u: AdminUser) {
-    const p = prompt(`Neues Passwort fǬr ${u.email}:`)
+    const p = prompt(`Neues Passwort für ${u.email}:`)
     if (!p) return
     try { await this.api.adminSetPassword(u.id, p); alert('Passwort gesetzt') } catch { alert('Fehlgeschlagen') }
   }
   async heal() {
     try {
       const { fixed } = await this.api.adminHealLibrary()
-      alert('Wartung abgeschlossen. Aktualisierte Eintraege: ' + fixed)
+      alert('Wartung abgeschlossen. Aktualisierte Einträge: ' + fixed)
       await this.load()
     } catch {
       alert('Wartung fehlgeschlagen')

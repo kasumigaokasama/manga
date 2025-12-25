@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  manga-shelf:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: manga-shelf
+    restart: unless-stopped
+    ports:
+      - "8888:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-please-change-this-secret-minimum-32-chars}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
+      - MAX_UPLOAD_MB=${MAX_UPLOAD_MB:-512}
+      - CORS_ORIGIN=${CORS_ORIGIN:-}
+      - SERVE_FRONTEND=1
+    volumes:
+      - manga-data:/app/storage
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.manga-shelf.rule=Host(`manga.yourdomain.com`)"
+      - "traefik.http.routers.manga-shelf.entrypoints=websecure"
+      - "traefik.http.routers.manga-shelf.tls.certresolver=letsencrypt"
+
+volumes:
+  manga-data:
+    driver: local
+
+networks:
+  default:
+    name: manga-shelf-network

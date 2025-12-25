@@ -64,7 +64,7 @@ import { signal } from '@angular/core'
           *ngIf="api.role() === 'admin' || api.role() === 'editor'"
           class="absolute top-2 right-2 bg-kurenai text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100"
           (click)="remove(b.id, $event)"
-          aria-label="Buch Loeschen"
+          aria-label="Buch löschen"
         >
           <span class="material-icons" aria-hidden="true">delete</span><span class="material-icons" aria-hidden="true">more_horiz</span></button>
         <a [routerLink]="['/reader', b.id]" class="block">
@@ -183,7 +183,7 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
         for (const b of items) {
           if (b.coverPath) this.fetchCover(b)
         }
-      } catch {}
+      } catch { }
     } finally {
       this.loading.set(false)
     }
@@ -216,7 +216,7 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
       a.click()
       document.body.removeChild(a)
       setTimeout(() => URL.revokeObjectURL(obj), 1000)
-    } catch {}
+    } catch { }
   }
 
   coverSrc(b: Book) {
@@ -234,9 +234,9 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
       if (!r.ok) return
       const blob = await r.blob()
       const obj = URL.createObjectURL(blob)
-      if (this.coverUrls[b.id]) { try { URL.revokeObjectURL(this.coverUrls[b.id]) } catch {} }
+      if (this.coverUrls[b.id]) { try { URL.revokeObjectURL(this.coverUrls[b.id]) } catch { } }
       this.coverUrls[b.id] = obj
-    } catch {}
+    } catch { }
   }
 
   onCoverLoad(b: Book) {
@@ -245,12 +245,12 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
       // Try to match same-origin SW cache when applicable
       const abs = new URL(this.api.base + b.coverPath)
       let lookup = abs
-      try { if (abs.origin === location.origin) lookup = new URL(abs.pathname + abs.search, location.origin) } catch {}
+      try { if (abs.origin === location.origin) lookup = new URL(abs.pathname + abs.search, location.origin) } catch { }
       const key = lookup.toString()
       if ('caches' in window) {
         caches.match(key, { ignoreSearch: true } as any).then((resp) => {
           if (resp) this.coverCached.update((m) => ({ ...m, [b.id]: true }))
-        }).catch(() => {})
+        }).catch(() => { })
       }
     } catch { /* ignore */ }
   }
@@ -296,12 +296,12 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
   async remove(id: number, ev: Event) {
     ev.stopPropagation()
     ev.preventDefault()
-    if (!confirm('Wirklich Loeschen?')) return
+    if (!confirm('Wirklich Löschen?')) return
     try {
       await this.api.deleteBook(id)
       await this.load(true)
     } catch {
-      alert('Loeschen fehlgeschlagen')
+      alert('Löschen fehlgeschlagen')
     }
   }
 
@@ -324,7 +324,7 @@ export class LibraryPage implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.observer?.disconnect()
     for (const k of Object.keys(this.coverUrls)) {
-      try { URL.revokeObjectURL(this.coverUrls[Number(k)]) } catch {}
+      try { URL.revokeObjectURL(this.coverUrls[Number(k)]) } catch { }
     }
   }
 

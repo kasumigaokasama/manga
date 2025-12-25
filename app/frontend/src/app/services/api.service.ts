@@ -20,18 +20,19 @@ export type ProgressResponse = { page: number; percent: number }
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  base = (function(){
+  base = (function () {
     const fromStorage = localStorage.getItem('apiBase');
     if (fromStorage) return fromStorage;
     try {
       if (typeof location !== 'undefined') {
         if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-          // If frontend runs on :4300 (Windows dev), point API to :3001
-          if (location.port === '4300') return 'http://localhost:3001';
-          return 'http://localhost:3000';
+          // Dev environment detection
+          if (location.port === '4200' || location.port === '4300') return 'http://localhost:3000';
+          // Otherwise (e.g. Docker on 8888), use relative path
+          return '';
         }
       }
-    } catch {}
+    } catch { }
     return '';
   })()
   token = signal<string | null>(localStorage.getItem('token'))
@@ -105,7 +106,7 @@ export class ApiService {
 
   logout() {
     // Clear server cookie (if present), then local token
-    fetch(`${this.base}/api/auth/logout`, { method: 'POST' }).catch(() => {})
+    fetch(`${this.base}/api/auth/logout`, { method: 'POST' }).catch(() => { })
     localStorage.removeItem('token')
     this.token.set(null)
     this.user.set(null)
@@ -141,7 +142,13 @@ export class ApiService {
           this.refreshMe()
         }
       })
-    } catch {}
+      // Clear stale apiBase if present and we are likely in production
+      const storedBase = localStorage.getItem('apiBase');
+      if (storedBase && storedBase.includes('localhost:3000') && location.port !== '4200' && location.port !== '4300') {
+        localStorage.removeItem('apiBase');
+        if (location.hostname !== 'localhost') location.reload();
+      }
+    } catch { }
     // Periodic refresh (5 minutes)
     setInterval(() => this.refreshMe(), 5 * 60 * 1000)
     // Idle timeout tracking
@@ -151,14 +158,14 @@ export class ApiService {
       window.addEventListener('keydown', reset)
       window.addEventListener('touchstart', reset, { passive: true } as any)
       document.addEventListener('visibilitychange', reset)
-    } catch {}
+    } catch { }
   }
 
   private resetIdleTimer() {
-    try { clearTimeout(this.idleTimer) } catch {}
+    try { clearTimeout(this.idleTimer) } catch { }
     if (!this.user() || this.settings.keepSignedIn()) return
     const ms = Math.max(5, this.settings.idleMinutes()) * 60 * 1000
-    this.idleTimer = setTimeout(() => { try { this.logout() } catch {} }, ms)
+    this.idleTimer = setTimeout(() => { try { this.logout() } catch { } }, ms)
   }
 
   async listBooks(params?: {

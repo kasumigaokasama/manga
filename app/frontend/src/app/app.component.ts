@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, HostListener, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
+import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router'
 import { ApiService } from './services/api.service'
 import { SettingsService } from './services/settings.service'
 import { I18nService } from './services/i18n.service'
@@ -20,7 +20,7 @@ import { ToastContainerComponent } from './components/toast-container.component'
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, BlossomsComponent, StarfieldComponent, SakuraBranchComponent, PetalBurstComponent, HelpModalComponent, ToastContainerComponent],
   template: `
-    <header class="shadow relative" [ngClass]="{ 'sakura-bg': theme.sakura(), 'bg-slate-900': !theme.sakura() }">
+    <header *ngIf="showHeader" class="shadow relative" [ngClass]="{ 'sakura-bg': theme.sakura(), 'bg-slate-900': !theme.sakura() }">
       <div class="flex items-center justify-between px-3 py-2">
         <div class="flex items-center gap-2">
           <a routerLink="/library" class="font-bold text-xl mr-2" [ngClass]="theme.sakura() ? 'text-aizome' : 'text-slate-100'">Manga Shelf</a>
@@ -52,7 +52,7 @@ import { ToastContainerComponent } from './components/toast-container.component'
           <button *ngIf="api.isAuthenticated()" class="px-2 py-1 rounded border" (click)="api.logout()" aria-label="Logout">Logout</button>
           <a *ngIf="!api.isAuthenticated()" class="px-2 py-1 rounded border" routerLink="/login" aria-label="Login">Login</a>
           <button #themeBtn class="px-2 py-1 rounded border" (click)="themeMenuOpen = !themeMenuOpen" aria-label="Theme Einstellungen" [attr.aria-expanded]="themeMenuOpen" [attr.aria-pressed]="themeMenuOpen" [ngClass]="{'text-kurenai font-semibold': themeMenuOpen}">Theme</button>
-          <button class="px-2 py-1 rounded border" (click)="helpOpen = true" aria-label="Hilfe oeffnen" [attr.aria-pressed]="helpOpen" [ngClass]="{'text-kurenai font-semibold': helpOpen}">Help</button>
+          <button class="px-2 py-1 rounded border" (click)="helpOpen = true" aria-label="Hilfe öffnen" [attr.aria-pressed]="helpOpen" [ngClass]="{'text-kurenai font-semibold': helpOpen}">Help</button>
         </nav>
         <button class="md:hidden px-2 py-1 rounded border" (click)="mobileMenuOpen = !mobileMenuOpen" aria-label="Menü umschalten">
           <span class="material-icons" aria-hidden="true">menu</span>
@@ -73,7 +73,7 @@ import { ToastContainerComponent } from './components/toast-container.component'
           <input type="checkbox" [checked]="theme.sakura()" (change)="onSakuraToggle($event)" /> Sakura an
         </label>
         <label class="flex items-center gap-2">
-          <input type="checkbox" [checked]="theme.blossoms()" (change)="theme.setBlossoms($any($event.target).checked)" /> Blueten an
+          <input type="checkbox" [checked]="theme.blossoms()" (change)="theme.setBlossoms($any($event.target).checked)" /> Blüten an
         </label>
         <label class="flex items-center gap-2" *ngIf="!theme.sakura()">
           <input type="checkbox" [checked]="theme.starfieldEnabled()" (change)="theme.setStarfieldEnabled($any($event.target).checked)" /> Sterne an
@@ -97,7 +97,7 @@ import { ToastContainerComponent } from './components/toast-container.component'
           <button *ngIf="api.token()" class="px-2 py-1 rounded border" (click)="api.logout(); mobileMenuOpen=false" aria-label="Logout">Logout</button>
           <a *ngIf="!api.token()" class="px-2 py-1 rounded border" routerLink="/login" (click)="mobileMenuOpen=false" aria-label="Login">Login</a>
           <button class="px-2 py-1 rounded border" (click)="themeMenuOpen = !themeMenuOpen" aria-label="Theme Einstellungen">Theme</button>
-          <button class="px-2 py-1 rounded border" (click)="helpOpen = true; mobileMenuOpen=false" aria-label="Hilfe oeffnen">Help</button>
+          <button class="px-2 py-1 rounded border" (click)="helpOpen = true; mobileMenuOpen=false" aria-label="Hilfe öffnen">Help</button>
         </div>
       </div>
     </nav>
@@ -105,7 +105,7 @@ import { ToastContainerComponent } from './components/toast-container.component'
     <main class="p-4 pb-24 md:pb-4">
       <router-outlet />
     </main>
-    <footer class="p-4 text-center text-xs text-gray-600">Nur fuer private Nutzung. Keine oeffentliche Verbreitung.</footer>
+    <footer class="p-4 text-center text-xs text-gray-600">Nur für private Nutzung. Keine öffentliche Verbreitung.</footer>
     <div *ngIf="!online()" class="fixed bottom-4 left-4 bg-amber-500 text-white text-xs px-3 py-2 rounded shadow z-50" role="status" aria-live="polite">Offline – Inhalte aus Cache</div>
     <app-blossoms [enabled]="theme.blossoms()" [density]="theme.blossomsDensity()" [speed]="theme.blossomsSpeed()"></app-blossoms>
     <app-starfield *ngIf="!theme.sakura() && theme.starfieldEnabled()" [density]="theme.starDensity()"></app-starfield>
@@ -122,7 +122,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   @ViewChild(PetalBurstComponent) petal!: PetalBurstComponent
   @ViewChild('themeMenu') themeMenuRef?: ElementRef<HTMLElement>
   @ViewChild('themeBtn') themeBtnRef?: ElementRef<HTMLElement>
+  // Header visibility control to prevent flash
+  showHeader = false
+
   private listener = (count: number, at?: { x: number; y: number }) => { this.petal?.trigger(count, at); this.sound.playBurst() }
+
   constructor(
     public api: ApiService,
     public i18n: I18nService,
@@ -130,8 +134,19 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     public settings: SettingsService,
     private bursts: BurstService,
     private sound: SoundService,
+    public router: Router,
     private toast: ToastService
-  ) { this.theme.apply() }
+  ) {
+    this.theme.apply()
+
+    // Only show header after navigation completes and we are NOT on login page
+    this.router.events.subscribe(e => {
+      if (e instanceof NavigationEnd) {
+        this.showHeader = e.urlAfterRedirects !== '/login'
+      }
+    })
+  }
+
   ngAfterViewInit() { this.bursts.on(this.listener) }
   ngOnDestroy() { this.bursts.off(this.listener) }
   onLanguageSelect(event: Event) {

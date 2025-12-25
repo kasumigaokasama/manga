@@ -24,14 +24,14 @@ export class MangaReaderComponent implements OnDestroy {
   total = signal(0)
   spread = signal(true)
   rtl = signal(true)
-  zoomMode = signal<'fit-width'|'fit-page'|'percent'>('fit-width')
+  zoomMode = signal<'fit-width' | 'fit-page' | 'percent'>('fit-width')
   zoomPercent = signal(100)
 
   private prefetching = new Set<number>()
   private destroyed = false
 
   constructor(private route: ActivatedRoute, private router: Router, private chapters: ChapterService) {
-    try { (GlobalWorkerOptions as any).workerSrc = '/assets/pdf.worker.min.mjs' } catch {}
+    try { (GlobalWorkerOptions as any).workerSrc = '/assets/pdf.worker.min.mjs?v=revolution' } catch { }
     const slug = this.route.snapshot.paramMap.get('slug') || 'one-piece'
     const chapter = this.route.snapshot.paramMap.get('chapter') || '001'
     this.ref = this.chapters.getChapter(slug, chapter)
@@ -81,7 +81,7 @@ export class MangaReaderComponent implements OnDestroy {
       const p2 = await this.pdfDoc.getPage(indices[1])
       await this.renderPageToCanvas(p2, rightCanvas)
     } else if (rightCanvas) {
-      const ctx = rightCanvas.getContext('2d'); if (ctx) { ctx.clearRect(0,0,rightCanvas.width,rightCanvas.height); rightCanvas.width = 0; rightCanvas.height = 0; }
+      const ctx = rightCanvas.getContext('2d'); if (ctx) { ctx.clearRect(0, 0, rightCanvas.width, rightCanvas.height); rightCanvas.width = 0; rightCanvas.height = 0; }
     }
 
     this.chapters.saveProgress(this.ref, current)
@@ -97,8 +97,8 @@ export class MangaReaderComponent implements OnDestroy {
     await page.render({ canvasContext: ctx, viewport: vp }).promise
   }
 
-  next() { const d = this.rtl() ? -1 : 1; this.setPage(this.page() + (this.spread() ? 2*d : d)) }
-  prev() { const d = this.rtl() ? 1 : -1; this.setPage(this.page() + (this.spread() ? 2*d : d)) }
+  next() { const d = this.rtl() ? -1 : 1; this.setPage(this.page() + (this.spread() ? 2 * d : d)) }
+  prev() { const d = this.rtl() ? 1 : -1; this.setPage(this.page() + (this.spread() ? 2 * d : d)) }
 
   setPage(n: number) {
     if (!this.pdfDoc) return
@@ -133,7 +133,7 @@ export class MangaReaderComponent implements OnDestroy {
     if (!this.pdfDoc) return
     const base = this.page()
     const d = this.rtl() ? -1 : 1
-    const candidates = [base + d, base + 2*d]
+    const candidates = [base + d, base + 2 * d]
     for (const n of candidates) {
       if (n < 1 || n > this.total()) continue
       if (this.prefetching.has(n)) continue

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, NgZone, ViewChild, ElementRef } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ApiService } from '../services/api.service'
@@ -14,7 +14,7 @@ import { ToastService } from '../services/toast.service'
     <section class="max-w-xl mx-auto card space-y-4">
       <h1 class="text-lg font-bold">Upload</h1>
       <p class="text-sm text-gray-600">
-        Unterstuetzte Formate: PDF, EPUB, CBZ/ZIP oder ZIP mit Bilder-Ordnern. Die Dateien landen in
+        Unterstützte Formate: PDF, EPUB, CBZ/ZIP oder ZIP mit Bilder-Ordnern. Die Dateien landen in
         <code>storage/originals</code>.
       </p>
       <form (ngSubmit)="submit()" class="space-y-3">
@@ -37,26 +37,27 @@ import { ToastService } from '../services/toast.service'
 
         <div class="space-y-2" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
           <label class="text-sm font-medium">Datei</label>
-          <input type="file" accept=".pdf,.epub,.cbz,.zip" (change)="onFile($event)" />
-          <p *ngIf="file" class="text-xs text-gray-500">Ausgewaehlt: {{ file?.name }}</p>
+          <input #fileInput type="file" accept=".pdf,.epub,.cbz,.zip" (change)="onFile($event)" />
+          <p *ngIf="file" class="text-xs text-gray-500">Ausgewählt: {{ file?.name }}</p>
           <div *ngIf="dragActive" class="text-xs text-gray-500">Datei hier ablegen…</div>
         </div>
 
-        <button class="bg-matcha text-white px-4 py-2 rounded w-full" [disabled]="busy" type="button" (click)="submit()">
-          {{ busy ? 'Upload laeuft...' : 'Hochladen' }}
+        <button class="bg-matcha text-white px-4 py-2 rounded w-full transition-all disabled:opacity-50" [disabled]="busy" type="button" (click)="submit()">
+          {{ busy ? 'Upload läuft...' : 'Hochladen' }}
         </button>
       </form>
 
-      <div *ngIf="busy" class="space-y-2">
-        <div class="h-2 bg-gray-200 rounded">
-          <div class="h-2 bg-kurenai rounded" [style.width.%]="progress"></div>
+      <div *ngIf="busy" class="space-y-2 pt-4">
+        <div class="h-2 bg-gray-200 rounded overflow-hidden">
+          <div class="h-full bg-kurenai transition-all duration-300" [style.width.%]="progress"></div>
         </div>
-        <div class="text-xs text-gray-500 text-center">{{ progress }} %</div>
+        <div class="text-xs text-gray-500 text-center font-mono">{{ progress }} %</div>
       </div>
     </section>
   `
 })
 export class UploadPage {
+  @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>
   title = ''
   author = ''
   language = ''
@@ -66,14 +67,18 @@ export class UploadPage {
   progress = 0
   dragActive = false
 
-  constructor(private api: ApiService, private bursts: BurstService, private toast: ToastService, private haptics: HapticsService) {}
+  constructor(
+    private api: ApiService,
+    private bursts: BurstService,
+    private toast: ToastService,
+    private haptics: HapticsService,
+    private zone: NgZone
+  ) { }
 
   onFile(event: Event) {
     const files = (event.target as HTMLInputElement).files
     this.file = files && files.length ? files[0] : undefined
   }
-
-  // DevExtreme removed
 
   onDragOver(event: DragEvent) {
     event.preventDefault()
@@ -96,8 +101,8 @@ export class UploadPage {
   }
 
   async submit() {
-    if (!this.file) {
-      this.toast.show('Bitte eine Datei auswaehlen.', 'error')
+    if (this.busy || !this.file) {
+      if (!this.file) this.toast.show('Bitte eine Datei auswählen.', 'error')
       return
     }
     const form = new FormData()
@@ -121,17 +126,22 @@ export class UploadPage {
       this.haptics.error()
       this.toast.show('Fehler beim Upload', 'error')
     } finally {
-      this.busy = false
+      this.zone.run(() => {
+        this.busy = false
+        this.progress = 0
+      })
     }
   }
 
   private resetForm() {
-    this.title = ''
-    this.author = ''
-    this.language = ''
-    this.tags = ''
-    this.file = undefined
-    this.progress = 0
+    this.zone.run(() => {
+      this.title = ''
+      this.author = ''
+      this.language = ''
+      this.tags = ''
+      this.file = undefined
+      if (this.fileInput) this.fileInput.nativeElement.value = ''
+    })
   }
 
   private uploadWithProgress(form: FormData) {
@@ -142,18 +152,22 @@ export class UploadPage {
       if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
 
       xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          this.progress = Math.min(100, Math.round((event.loaded / event.total) * 100))
-        }
+        this.zone.run(() => {
+          if (event.lengthComputable) {
+            this.progress = Math.min(100, Math.round((event.loaded / event.total) * 100))
+          }
+        })
       }
 
-      xhr.onerror = () => reject(new Error('Upload fehlgeschlagen'))
+      xhr.onerror = () => this.zone.run(() => reject(new Error('Upload fehlgeschlagen')))
       xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          resolve()
-        } else {
-          reject(new Error(xhr.statusText))
-        }
+        this.zone.run(() => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve()
+          } else {
+            reject(new Error(xhr.statusText))
+          }
+        })
       }
 
       xhr.send(form)

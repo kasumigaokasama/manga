@@ -85,36 +85,41 @@ export async function migrateAndSeed() {
     .addColumn('updatedAt', 'text', (c) => c.notNull().defaultTo(new Date().toISOString()))
     .execute()
 
-  // Seed users if none (dev only)
+  // Seed users if none (checking both dev and production for initial admin)
   const userCount = await db.selectFrom('users').select((eb) => eb.fn.countAll().as('c')).executeTakeFirst()
-  if ((process.env.NODE_ENV || 'development') !== 'production' && (!userCount || (userCount as any).c === 0)) {
+  if (!userCount || (userCount as any).c === 0) {
     const bcrypt = await import('bcrypt')
-    const adminHash = await bcrypt.hash('ChangeThis123!', 10)
-    const friendHash = await bcrypt.hash('ChangeThis123!', 10)
+
+    // Use env vars or defaults
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com'
+    const adminPass = process.env.ADMIN_PASSWORD || 'ChangeThis123!'
+    const adminHash = await bcrypt.hash(adminPass, 10)
+
+    console.log(`Seeding initial admin user: ${adminEmail}`)
+
     await db
       .insertInto('users')
       .values([
         {
-          email: 'admin@example.com',
+          email: adminEmail,
           passwordHash: adminHash,
           role: 'admin',
           createdAt: new Date().toISOString()
-        },
-        {
-          email: 'friend1@example.com',
-          passwordHash: friendHash,
-          role: 'reader',
-          createdAt: new Date().toISOString()
-        },
-        {
-          email: 'friend2@example.com',
-          passwordHash: friendHash,
-          role: 'reader',
-          createdAt: new Date().toISOString()
         }
       ])
-      .onConflict((oc) => oc.column('email').doNothing())
       .execute()
+
+    // Add dummy readers only in development
+    if (process.env.NODE_ENV !== 'production') {
+      const friendHash = await bcrypt.hash('ChangeThis123!', 10)
+      await db
+        .insertInto('users')
+        .values([
+          { email: 'friend1@example.com', passwordHash: friendHash, role: 'reader', createdAt: new Date().toISOString() },
+          { email: 'friend2@example.com', passwordHash: friendHash, role: 'reader', createdAt: new Date().toISOString() }
+        ])
+        .execute()
+    }
   }
 
   // Dev convenience: if no books exist, auto-import sample.pdf from repo root (dev only)

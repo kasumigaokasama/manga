@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common'
          [ngClass]="{'bg-white text-aizome': dayMode, 'bg-slate-800 text-slate-100': !dayMode}">
       <div class="flex items-center justify-between mb-2">
         <h2 class="text-lg font-bold">Hilfe &amp; Schnelltest</h2>
-        <button class="border px-2 py-1 rounded" (click)="close.emit()">Schliessen</button>
+        <button class="border px-2 py-1 rounded" (click)="close.emit()">Schließen</button>
       </div>
       <div class="text-sm space-y-2">
         <div>
@@ -25,22 +25,22 @@ import { CommonModule } from '@angular/common'
           <strong>Upload</strong>: CBZ/PDF hochladen &rarr; Bibliothek zeigt Cover bzw. Reader-Link.
         </div>
         <div>
-          <strong>Reader</strong>: Pfeile/Tippen zum Bl&auml;ttern, Scrubber unten, RTL/2-up umschalten.
+          <strong>Reader</strong>: Pfeile/Tippen zum Blättern, Scrubber unten, RTL/2-up umschalten.
         </div>
         <div>
           <strong>Downloads &amp; Streaming</strong>: EPUB via <code>/api/books/:id/download</code>. PDFs per Range-Streaming (<code>GET /api/books/:id/stream</code>), Metadaten via <code>HEAD</code>.
         </div>
         <div>
-          <strong>Theme</strong>: Toolbar &bdquo;Theme&ldquo; &rarr; Presets (Day/Night/Minimal), Sterne/Bl&uuml;ten ein/aus.
+          <strong>Theme</strong>: Toolbar &bdquo;Theme&ldquo; &rarr; Presets (Day/Night/Minimal), Sterne/Blüten ein/aus.
         </div>
         <div>
           <strong>Effekte</strong>: Petal-Bursts bei Login/Upload; Sound in Einstellungen aktivierbar.
         </div>
         <div>
-          <strong>Admin</strong>: Seite /admin f&uuml;r Benutzerverwaltung; Audit-Log live.
+          <strong>Admin</strong>: Seite /admin für Benutzerverwaltung; Audit-Log live.
         </div>
         <div>
-          <strong>Tastatur</strong>: &larr;/&rarr; Bl&auml;ttern (RTL respektiert), [ / ] Zoom, F Vollbild, R Richtung, S Spread, D Sakura.
+          <strong>Tastatur</strong>: &larr;/&rarr; Blättern (RTL respektiert), [ / ] Zoom, F Vollbild, R Richtung, S Spread, D Sakura.
         </div>
       </div>
     </div>

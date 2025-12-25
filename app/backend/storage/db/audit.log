@@ -62,3 +62,11 @@
 {"ts":"2025-10-12T19:16:24.913Z","event":"book_upload","userId":1,"bookId":62,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
 {"ts":"2025-10-12T19:16:24.998Z","event":"book_upload","userId":1,"bookId":63,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
 {"ts":"2025-10-12T19:20:49.725Z","event":"book_upload","userId":1,"bookId":64,"title":"bra","format":"pdf","language":"de","tags":[]}
+{"ts":"2025-12-24T21:09:42.979Z","event":"book_upload","userId":1,"bookId":2,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-12-24T21:09:43.014Z","event":"book_upload","userId":1,"bookId":3,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-12-24T21:09:43.059Z","event":"book_upload","userId":1,"bookId":4,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-12-24T21:09:43.522Z","event":"book_upload","userId":1,"bookId":5,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
+{"ts":"2025-12-24T21:10:03.743Z","event":"book_upload","userId":1,"bookId":6,"title":"Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-12-24T21:10:03.801Z","event":"book_upload","userId":1,"bookId":7,"title":"Test CBZ Upload","format":"cbz","language":null,"tags":[]}
+{"ts":"2025-12-24T21:10:03.841Z","event":"book_upload","userId":1,"bookId":8,"title":"DL Given Title","format":"epub","language":null,"tags":[]}
+{"ts":"2025-12-24T21:10:03.937Z","event":"book_upload","userId":1,"bookId":9,"title":"Test PDF Upload","format":"pdf","language":null,"tags":[]}
