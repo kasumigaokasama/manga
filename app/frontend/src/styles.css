@@ -202,6 +202,33 @@ body.theme-emerald {
   color: #d1fae5;
 }
 
+/* Override any remaining white/light backgrounds */
+.theme-emerald .bg-white {
+  background: rgba(6, 78, 59, 0.7) !important;
+  color: #d1fae5;
+}
+
+.theme-emerald .bg-gray-100 {
+  background: rgba(5, 46, 38, 0.5) !important;
+  color: #d1fae5;
+}
+
+.theme-emerald .text-gray-800,
+.theme-emerald .text-gray-900 {
+  color: #d1fae5 !important;
+}
+
+.theme-emerald .text-gray-600 {
+  color: rgba(167, 243, 208, 0.8) !important;
+}
+
+/* Fix select dropdowns in emerald theme */
+.theme-emerald select {
+  background: rgba(5, 46, 38, 0.9);
+  color: #d1fae5;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
 header a.font-bold {
   display: inline-block;
   animation: sakura-wobble 6s ease-in-out infinite;

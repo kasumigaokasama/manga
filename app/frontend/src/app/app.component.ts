@@ -70,8 +70,8 @@ import { ToastContainerComponent } from './components/toast-container.component'
     </header>
 
     <!-- Theme dropdown -->
-    <div *ngIf="themeMenuOpen" #themeMenu class="absolute right-2 mt-2 z-30 bg-white border rounded shadow p-3 text-sm"
-         [ngClass]="{'bg-white text-aizome': theme.sakura(), 'bg-emerald-50 text-emerald-900': theme.emerald(), 'bg-slate-800 text-slate-100': theme.dark()}">
+    <div *ngIf="themeMenuOpen" #themeMenu class="absolute right-2 top-14 z-30 border rounded shadow p-3 text-sm"
+         [ngClass]="{'bg-white text-aizome': theme.sakura(), 'bg-emerald-900/95 text-emerald-100 border-emerald-500': theme.emerald(), 'bg-slate-800 text-slate-100': theme.dark()}">
       <div class="flex gap-2">
         <button class="border px-2 py-1 rounded" (click)="theme.preset('sakura'); themeMenuOpen=false">{{ i18n.t('pages.settings.preset_sakura') }}</button>
         <button class="border px-2 py-1 rounded" (click)="theme.preset('night'); themeMenuOpen=false">{{ i18n.t('pages.settings.preset_night') }}</button>
