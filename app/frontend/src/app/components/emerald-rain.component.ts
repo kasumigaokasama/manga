@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common'
   standalone: true,
   selector: 'app-emerald-rain',
   imports: [CommonModule],
-  template: `<canvas #c class="fixed inset-0 pointer-events-none" style="z-index:3" *ngIf="enabled"></canvas>`
+  template: `<canvas #c class="fixed inset-0 pointer-events-none" style="z-index:1" *ngIf="enabled"></canvas>`
 })
 export class EmeraldRainComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() enabled = false
@@ -13,13 +13,14 @@ export class EmeraldRainComponent implements AfterViewInit, OnDestroy, OnChanges
   @Input() speed = 1
   @ViewChild('c', { static: false }) canvas?: ElementRef<HTMLCanvasElement>
   private raf = 0
-  private crystals: {
-    x: number; y: number; vy: number;
-    rot: number; rotv: number;
-    t: number; tVel: number; amp: number;
+  private gems: {
+    x: number; y: number;
     size: number;
     alpha: number; hue: number;
-    shimmer: number;
+    shimmerPhase: number;
+    shimmerSpeed: number;
+    pulsePhase: number;
+    rotation: number;
   }[] = []
   private resizeHandler = () => {}
   private ctx?: CanvasRenderingContext2D
@@ -40,58 +41,80 @@ export class EmeraldRainComponent implements AfterViewInit, OnDestroy, OnChanges
     }
   }
 
-  spawn(c: HTMLCanvasElement) {
-    const vw = c.width / this.dpr
+  spawnGem(vw: number, vh: number) {
     const x = Math.random() * vw
-    const y = -10 - Math.random() * 60
-    const vy = 0.5 + Math.random() * 1.5
-    const rot = Math.random() * Math.PI * 2
-    const rotv = (Math.random() - 0.5) * 0.02
-    const t = Math.random() * Math.PI * 2
-    const tVel = 0.008 + Math.random() * 0.015
-    const amp = 0.3 + Math.random() * 0.8
-    const size = 3 + Math.random() * 4
-    const alpha = 0.6 + Math.random() * 0.4
-    const hue = 150 + Math.random() * 30 // emerald green range
-    const shimmer = Math.random() * Math.PI * 2
-    return { x, y, vy, rot, rotv, t, tVel, amp, size, alpha, hue, shimmer }
+    const y = Math.random() * vh
+    const size = 2 + Math.random() * 5
+    const alpha = 0.3 + Math.random() * 0.5
+    const hue = 140 + Math.random() * 40 // emerald green range
+    const shimmerPhase = Math.random() * Math.PI * 2
+    const shimmerSpeed = 0.01 + Math.random() * 0.02
+    const pulsePhase = Math.random() * Math.PI * 2
+    const rotation = Math.random() * Math.PI * 2
+    return { x, y, size, alpha, hue, shimmerPhase, shimmerSpeed, pulsePhase, rotation }
   }
 
   ngOnDestroy(): void { this.destroy() }
 
-  private drawCrystal(ctx: CanvasRenderingContext2D, size: number, hue: number, alpha: number, shimmer: number) {
-    // Draw a diamond/crystal shape
-    const shimmerAlpha = 0.3 + Math.sin(shimmer) * 0.2
+  private drawGem(ctx: CanvasRenderingContext2D, gem: {
+    x: number; y: number; size: number; alpha: number; hue: number;
+    shimmerPhase: number; rotation: number; pulsePhase: number;
+  }) {
+    const shimmerIntensity = Math.sin(gem.shimmerPhase) * 0.5 + 0.5
+    const pulseSize = Math.sin(gem.pulsePhase) * 0.3 + 1
+
+    ctx.save()
+    ctx.translate(gem.x, gem.y)
+    ctx.rotate(gem.rotation)
+
+    const effectiveSize = gem.size * pulseSize
 
     // Outer glow
-    ctx.fillStyle = `hsla(${hue}, 80%, 70%, ${alpha * 0.3})`
+    const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, effectiveSize * 3)
+    glowGradient.addColorStop(0, `hsla(${gem.hue}, 80%, 60%, ${gem.alpha * shimmerIntensity * 0.4})`)
+    glowGradient.addColorStop(0.5, `hsla(${gem.hue}, 70%, 50%, ${gem.alpha * shimmerIntensity * 0.2})`)
+    glowGradient.addColorStop(1, `hsla(${gem.hue}, 60%, 40%, 0)`)
+    ctx.fillStyle = glowGradient
     ctx.beginPath()
-    ctx.moveTo(0, -size * 1.4)
-    ctx.lineTo(size * 0.8, 0)
-    ctx.lineTo(0, size * 1.4)
-    ctx.lineTo(-size * 0.8, 0)
+    ctx.arc(0, 0, effectiveSize * 3, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Main gem body (hexagon shape)
+    ctx.fillStyle = `hsla(${gem.hue}, 90%, 45%, ${gem.alpha})`
+    ctx.beginPath()
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i
+      const x = Math.cos(angle) * effectiveSize
+      const y = Math.sin(angle) * effectiveSize
+      if (i === 0) ctx.moveTo(x, y)
+      else ctx.lineTo(x, y)
+    }
     ctx.closePath()
     ctx.fill()
 
-    // Main crystal
-    ctx.fillStyle = `hsla(${hue}, 90%, 60%, ${alpha})`
+    // Inner highlight with shimmer
+    const highlightIntensity = shimmerIntensity * 0.8 + 0.2
+    ctx.fillStyle = `hsla(${gem.hue + 20}, 100%, 75%, ${gem.alpha * highlightIntensity})`
     ctx.beginPath()
-    ctx.moveTo(0, -size)
-    ctx.lineTo(size * 0.6, 0)
-    ctx.lineTo(0, size)
-    ctx.lineTo(-size * 0.6, 0)
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i
+      const x = Math.cos(angle) * effectiveSize * 0.5
+      const y = Math.sin(angle) * effectiveSize * 0.5
+      if (i === 0) ctx.moveTo(x, y)
+      else ctx.lineTo(x, y)
+    }
     ctx.closePath()
     ctx.fill()
 
-    // Highlight
-    ctx.fillStyle = `hsla(${hue + 10}, 100%, 85%, ${alpha * shimmerAlpha})`
-    ctx.beginPath()
-    ctx.moveTo(0, -size * 0.7)
-    ctx.lineTo(size * 0.3, -size * 0.2)
-    ctx.lineTo(0, size * 0.3)
-    ctx.lineTo(-size * 0.3, -size * 0.2)
-    ctx.closePath()
-    ctx.fill()
+    // Bright sparkle point
+    if (shimmerIntensity > 0.7) {
+      ctx.fillStyle = `hsla(${gem.hue + 30}, 100%, 95%, ${(shimmerIntensity - 0.7) * 3 * gem.alpha})`
+      ctx.beginPath()
+      ctx.arc(-effectiveSize * 0.3, -effectiveSize * 0.3, effectiveSize * 0.3, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    ctx.restore()
   }
 
   private initIfNeeded(reinit = false) {
@@ -108,34 +131,29 @@ export class EmeraldRainComponent implements AfterViewInit, OnDestroy, OnChanges
       c.style.width = w + 'px'
       c.style.height = h + 'px'
       ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0)
+
+      // Respawn gems when resizing
+      const vw = w
+      const vh = h
+      const n = Math.max(20, Math.min(300, Math.floor(this.density)))
+      this.gems = Array.from({ length: n }, () => this.spawnGem(vw, vh))
     }
-    resize(); window.addEventListener('resize', resize)
+    resize()
+    window.addEventListener('resize', resize)
     this.resizeHandler = resize
-    const n = Math.max(12, Math.min(220, Math.floor(this.density)))
-    this.crystals = Array.from({ length: n }, () => this.spawn(c))
+
     const loop = () => {
       if (!this.ctx) return
       ctx.clearRect(0, 0, c.width, c.height)
-      for (const p of this.crystals) {
-        p.t += p.tVel * this.speed
-        const wind = Math.sin(p.t) * p.amp
-        const jitter = (Math.random() - 0.5) * 0.1 * this.speed
-        p.vy += 0.001 * this.speed
-        p.x += wind + jitter
-        p.y += p.vy
-        p.rot += p.rotv * this.speed
-        p.shimmer += 0.05 * this.speed
 
-        const vw = c.width / this.dpr
-        const vh = c.height / this.dpr
-        if (p.y > vh + 30 || p.x < -40 || p.x > vw + 40) Object.assign(p, this.spawn(c))
+      for (const gem of this.gems) {
+        // Update shimmer and pulse phases
+        gem.shimmerPhase += gem.shimmerSpeed * this.speed
+        gem.pulsePhase += 0.008 * this.speed
 
-        ctx.save()
-        ctx.translate(p.x, p.y)
-        ctx.rotate(p.rot)
-        this.drawCrystal(ctx, p.size, p.hue, p.alpha, p.shimmer)
-        ctx.restore()
+        this.drawGem(ctx, gem)
       }
+
       this.raf = requestAnimationFrame(loop)
     }
     this.raf = requestAnimationFrame(loop)
@@ -145,6 +163,6 @@ export class EmeraldRainComponent implements AfterViewInit, OnDestroy, OnChanges
     cancelAnimationFrame(this.raf)
     window.removeEventListener('resize', this.resizeHandler)
     this.ctx = undefined
-    this.crystals = []
+    this.gems = []
   }
 }

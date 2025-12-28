@@ -131,6 +131,9 @@ import { I18nService } from '../services/i18n.service'
     :host-context(.theme-dark) .login-bg {
       background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #1e293b 100%);
     }
+    :host-context(.theme-emerald) .login-bg {
+      background: linear-gradient(135deg, #0a1f1a 0%, #064e3b 50%, #0a1f1a 100%);
+    }
 
     .orb {
       position: absolute;
@@ -147,6 +150,9 @@ import { I18nService } from '../services/i18n.service'
       left: -100px;
       animation-delay: 0s;
     }
+    :host-context(.theme-emerald) .orb-1 {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.2));
+    }
     .orb-2 {
       width: 300px;
       height: 300px;
@@ -155,6 +161,9 @@ import { I18nService } from '../services/i18n.service'
       right: -50px;
       animation-delay: -7s;
     }
+    :host-context(.theme-emerald) .orb-2 {
+      background: linear-gradient(135deg, rgba(5, 150, 105, 0.25), rgba(6, 78, 59, 0.15));
+    }
     .orb-3 {
       width: 200px;
       height: 200px;
@@ -162,6 +171,9 @@ import { I18nService } from '../services/i18n.service'
       top: 50%;
       left: 50%;
       animation-delay: -14s;
+    }
+    :host-context(.theme-emerald) .orb-3 {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(4, 120, 87, 0.1));
     }
 
     @keyframes float {
@@ -178,13 +190,33 @@ import { I18nService } from '../services/i18n.service'
       border: 1px solid rgba(255, 255, 255, 0.5);
       border-radius: 24px;
       padding: 2.5rem;
-      box-shadow: 
+      box-shadow:
         0 25px 50px -12px rgba(0, 0, 0, 0.15),
         0 0 0 1px rgba(255, 255, 255, 0.1);
     }
     :host-context(.theme-dark) .login-card {
       background: rgba(30, 41, 59, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    :host-context(.theme-emerald) .login-card {
+      background: rgba(6, 78, 59, 0.9);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(16, 185, 129, 0.2),
+        inset 0 1px 0 rgba(16, 185, 129, 0.1);
+    }
+    :host-context(.theme-emerald) .login-card h1,
+    :host-context(.theme-emerald) .login-card p,
+    :host-context(.theme-emerald) .login-card label {
+      color: #d1fae5;
+    }
+    :host-context(.theme-emerald) .login-card .text-gray-500,
+    :host-context(.theme-emerald) .login-card .text-gray-400 {
+      color: rgba(167, 243, 208, 0.7) !important;
+    }
+    :host-context(.theme-emerald) .login-card svg {
+      color: #6ee7b7;
     }
 
     .login-input {
@@ -211,8 +243,20 @@ import { I18nService } from '../services/i18n.service'
       border-color: #f472b6;
       box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.15);
     }
+    :host-context(.theme-emerald) .login-input {
+      background: rgba(5, 46, 38, 0.9);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #d1fae5;
+    }
+    :host-context(.theme-emerald) .login-input:focus {
+      border-color: rgba(16, 185, 129, 0.7);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
     .login-input::placeholder {
       color: #9ca3af;
+    }
+    :host-context(.theme-emerald) .login-input::placeholder {
+      color: rgba(167, 243, 208, 0.4);
     }
 
     .login-button {
@@ -230,6 +274,13 @@ import { I18nService } from '../services/i18n.service'
     .login-button:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(236, 72, 153, 0.5);
+    }
+    :host-context(.theme-emerald) .login-button {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+    :host-context(.theme-emerald) .login-button:hover:not(:disabled) {
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
     }
     .login-button:active:not(:disabled) {
       transform: translateY(0);
