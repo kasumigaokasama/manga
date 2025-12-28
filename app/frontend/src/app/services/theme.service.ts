@@ -22,8 +22,11 @@ export class ThemeService {
   starfieldEnabled = signal<boolean>(localStorage.getItem('starfield') !== '0')
 
   apply() {
+    const html = document.documentElement
     const body = document.body
+    html.classList.remove('theme-sakura', 'theme-dark', 'theme-emerald')
     body.classList.remove('theme-sakura', 'theme-dark', 'theme-emerald')
+    html.classList.add(`theme-${this.themeName()}`)
     body.classList.add(`theme-${this.themeName()}`)
   }
 
