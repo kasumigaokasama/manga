@@ -104,9 +104,8 @@ body.theme-emerald {
   @apply accent-emerald-500;
 }
 
-.theme-emerald button,
-.theme-emerald .border {
-  @apply border-emerald-300;
+.theme-emerald button {
+  border-color: #6ee7b7;
 }
 
 .theme-emerald button:hover {
