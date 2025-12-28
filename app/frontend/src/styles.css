@@ -86,11 +86,18 @@ body.theme-sakura {
   }
 }
 
+html.theme-emerald,
+html.theme-emerald body,
 .theme-emerald body,
 body.theme-emerald {
+  background-color: #0a1f1a !important;
   background: linear-gradient(135deg, #0a1f1a 0%, #064e3b 50%, #0a1f1a 100%) !important;
   color: #d1fae5 !important;
   min-height: 100vh;
+}
+
+html.theme-emerald,
+body.theme-emerald {
   background-attachment: fixed;
   /* Cave texture with subtle noise */
   background-image:
@@ -180,7 +187,7 @@ body.theme-emerald {
 }
 
 .theme-emerald footer {
-  color: rgba(167, 243, 208, 0.6);
+  color: rgba(167, 243, 208, 0.95);
 }
 
 /* Ensure material icons are visible in emerald theme */
