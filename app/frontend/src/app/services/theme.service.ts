@@ -27,7 +27,7 @@ export class ThemeService {
   setStarfieldEnabled(v: boolean) { this.starfieldEnabled.set(v); localStorage.setItem('starfield', v ? '1' : '0') }
 
   // Presets
-  preset(dayNight: 'sakura-day' | 'sakura-night' | 'minimal') {
+  preset(dayNight: 'sakura-day' | 'sakura-night' | 'emerald-forest') {
     if (dayNight === 'sakura-day') {
       this.setSakura(true)
       this.setBlossoms(true)
@@ -40,7 +40,7 @@ export class ThemeService {
       this.setStarDensity(200)
       this.setBlossoms(false)
     } else {
-      // emerald
+      // emerald-forest
       this.setTheme('emerald')
       this.setBlossoms(false)
       this.setStarfieldEnabled(false)

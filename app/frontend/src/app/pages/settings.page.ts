@@ -47,7 +47,7 @@ import { I18nService } from '../services/i18n.service'
         <div class="flex flex-wrap gap-2 pt-2">
           <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('sakura-day')">{{ i18n.t('pages.settings.preset_sakura_day') }}</button>
           <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('sakura-night')">{{ i18n.t('pages.settings.preset_sakura_night') }}</button>
-          <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('minimal')">{{ i18n.t('pages.settings.preset_minimal') }}</button>
+          <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('emerald-forest')">{{ i18n.t('pages.settings.preset_emerald_forest') }}</button>
           <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="mobilePreset()">{{ i18n.t('pages.settings.preset_mobile') }}</button>
           <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="resetThemeOnly()" [title]="i18n.t('pages.settings.reset_theme')">{{ i18n.t('pages.settings.reset_theme') }}</button>
           <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="resetAll()">{{ i18n.t('pages.settings.reset_all') }}</button>
