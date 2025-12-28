@@ -24,24 +24,24 @@ import { ToastContainerComponent } from './components/toast-container.component'
     <header *ngIf="showHeader" class="shadow relative" [ngClass]="{ 'sakura-bg': theme.sakura(), 'emerald-bg': theme.emerald(), 'bg-slate-900': theme.dark() }">
       <div class="flex items-center justify-between px-3 py-2">
         <div class="flex items-center gap-2">
-          <a routerLink="/library" class="font-bold text-xl mr-2" [ngClass]="theme.sakura() ? 'text-aizome' : theme.emerald() ? 'text-emerald-900' : 'text-slate-100'">Manga Shelf</a>
+          <a routerLink="/library" class="font-bold text-xl mr-2" [ngClass]="theme.sakura() ? 'text-aizome' : theme.emerald() ? 'text-emerald-100' : 'text-slate-100'">Manga Shelf</a>
           <app-sakura-branch class="hidden sm:block"></app-sakura-branch>
-          <span class="text-xs sm:text-sm truncate" [ngClass]="theme.sakura() ? 'text-aizome' : theme.emerald() ? 'text-emerald-800' : 'text-slate-200'" *ngIf="api.email()">{{ api.email() }} ({{ i18n.t('roles.' + api.role()) }})</span>
+          <span class="text-xs sm:text-sm truncate" [ngClass]="theme.sakura() ? 'text-aizome' : theme.emerald() ? 'text-emerald-200' : 'text-slate-200'" *ngIf="api.email()">{{ api.email() }} ({{ i18n.t('roles.' + api.role()) }})</span>
         </div>
-        <nav class="hidden md:flex items-center space-x-2 text-sm">
-          <a routerLink="/library" routerLinkActive #rlaDLib="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDLib.isActive}">
+        <nav class="hidden md:flex items-center space-x-2 text-sm" [ngClass]="theme.sakura() ? 'text-aizome' : theme.emerald() ? 'text-emerald-100' : 'text-slate-100'">
+          <a routerLink="/library" routerLinkActive #rlaDLib="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDLib.isActive && theme.sakura(), 'text-emerald-300 font-semibold': rlaDLib.isActive && theme.emerald(), 'text-blue-400 font-semibold': rlaDLib.isActive && theme.dark()}">
             <span class="material-icons" aria-hidden="true">local_library</span>
             <span class="ml-1" [class.hidden]="settings.toolbarIconsOnly()">{{ i18n.t('common.library') }}</span>
           </a>
-          <a *ngIf="api.role()==='admin' || api.role()==='editor'" routerLink="/upload" routerLinkActive #rlaDUp="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDUp.isActive}">
+          <a *ngIf="api.role()==='admin' || api.role()==='editor'" routerLink="/upload" routerLinkActive #rlaDUp="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDUp.isActive && theme.sakura(), 'text-emerald-300 font-semibold': rlaDUp.isActive && theme.emerald(), 'text-blue-400 font-semibold': rlaDUp.isActive && theme.dark()}">
             <span class="material-icons" aria-hidden="true">file_upload</span>
             <span class="ml-1" [class.hidden]="settings.toolbarIconsOnly()">{{ i18n.t('common.upload') }}</span>
           </a>
-          <a *ngIf="api.role()==='admin'" routerLink="/admin" routerLinkActive #rlaDAdm="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDAdm.isActive}">
+          <a *ngIf="api.role()==='admin'" routerLink="/admin" routerLinkActive #rlaDAdm="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDAdm.isActive && theme.sakura(), 'text-emerald-300 font-semibold': rlaDAdm.isActive && theme.emerald(), 'text-blue-400 font-semibold': rlaDAdm.isActive && theme.dark()}">
             <span class="material-icons" aria-hidden="true">admin_panel_settings</span>
             <span class="ml-1" [class.hidden]="settings.toolbarIconsOnly()">{{ i18n.t('common.admin') }}</span>
           </a>
-          <a routerLink="/settings" routerLinkActive #rlaDSet="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDSet.isActive}">
+          <a routerLink="/settings" routerLinkActive #rlaDSet="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDSet.isActive && theme.sakura(), 'text-emerald-300 font-semibold': rlaDSet.isActive && theme.emerald(), 'text-blue-400 font-semibold': rlaDSet.isActive && theme.dark()}">
             <span class="material-icons" aria-hidden="true">settings</span>
             <span class="ml-1" [class.hidden]="settings.toolbarIconsOnly()">{{ i18n.t('common.settings') }}</span>
           </a>

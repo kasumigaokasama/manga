@@ -11,9 +11,29 @@
   --emerald: #10b981;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: 'Noto Sans JP', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
 }
 
 /* Improve keyboard focus visibility */
@@ -27,7 +47,7 @@ body {
 }
 
 .emerald-bg {
-  background: linear-gradient(180deg, #a7f3d0, #d1fae5);
+  background: linear-gradient(180deg, #064e3b, #065f46);
 }
 
 .card {
@@ -67,37 +87,60 @@ body.theme-sakura {
 }
 
 body.theme-emerald {
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  color: #064e3b;
+  background: linear-gradient(135deg, #0a1f1a 0%, #064e3b 50%, #0a1f1a 100%);
+  color: #d1fae5;
+  min-height: 100vh;
+  background-attachment: fixed;
+  /* Cave texture with subtle noise */
   background-image:
-    radial-gradient(circle at 20px 20px, rgba(16, 185, 129, 0.08) 2px, transparent 3px),
-    radial-gradient(circle at 40px 40px, rgba(16, 185, 129, 0.05) 1px, transparent 2px);
-  background-size: 60px 60px;
+    radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 40% 80%, rgba(5, 150, 105, 0.1) 0%, transparent 35%);
 }
 
 .theme-emerald .card {
-  @apply bg-white/90 backdrop-blur-sm border border-emerald-200 shadow-md;
-  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1), 0 2px 4px rgba(16, 185, 129, 0.06);
+  @apply backdrop-blur-sm border shadow-md;
+  background: rgba(6, 78, 59, 0.7);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #d1fae5;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(16, 185, 129, 0.1),
+    inset 0 1px 0 rgba(16, 185, 129, 0.1);
 }
 
 .theme-emerald .card:hover {
-  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.15), 0 4px 8px rgba(16, 185, 129, 0.1);
-  border-color: #6ee7b7;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(16, 185, 129, 0.2),
+    inset 0 1px 0 rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(6, 78, 59, 0.85);
 }
 
 .theme-emerald .text-matcha {
-  color: var(--emerald);
+  color: #6ee7b7;
 }
 
 /* Emerald Theme Form Elements */
 .theme-emerald input:not([type="checkbox"]):not([type="range"]),
 .theme-emerald select,
 .theme-emerald textarea {
-  @apply bg-emerald-50/50 border-emerald-300 text-emerald-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/50;
+  background: rgba(5, 46, 38, 0.8);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #d1fae5;
+}
+
+.theme-emerald input:not([type="checkbox"]):not([type="range"]):focus,
+.theme-emerald select:focus,
+.theme-emerald textarea:focus {
+  border-color: rgba(16, 185, 129, 0.6);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 
 .theme-emerald input::placeholder {
-  @apply text-emerald-600/60;
+  color: rgba(167, 243, 208, 0.4);
 }
 
 .theme-emerald input[type="range"] {
@@ -105,23 +148,58 @@ body.theme-emerald {
 }
 
 .theme-emerald button {
-  border-color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #d1fae5;
+  background: rgba(6, 78, 59, 0.5);
 }
 
 .theme-emerald button:hover {
-  @apply bg-emerald-50;
+  background: rgba(5, 150, 105, 0.3);
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
 }
 
 .theme-emerald .bg-matcha {
-  @apply bg-emerald-600 hover:bg-emerald-700;
+  background: linear-gradient(135deg, #059669, #047857);
+  color: white;
+}
+
+.theme-emerald .bg-matcha:hover {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
 .theme-emerald a:not(.font-bold) {
-  @apply text-emerald-700 hover:text-emerald-900;
+  color: #6ee7b7;
+}
+
+.theme-emerald a:not(.font-bold):hover {
+  color: #a7f3d0;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
 }
 
 .theme-emerald footer {
-  @apply text-emerald-700/70;
+  color: rgba(167, 243, 208, 0.6);
+}
+
+/* Ensure material icons are visible in emerald theme */
+.theme-emerald .material-icons {
+  color: #6ee7b7;
+}
+
+/* Auth mode badge in emerald theme */
+.theme-emerald .bg-blue-50,
+.theme-emerald .bg-emerald-50,
+.theme-emerald .bg-gray-50 {
+  background: rgba(5, 150, 105, 0.2);
+  color: #d1fae5;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.theme-emerald .text-blue-900,
+.theme-emerald .text-emerald-900,
+.theme-emerald .text-gray-700 {
+  color: #d1fae5;
 }
 
 header a.font-bold {
