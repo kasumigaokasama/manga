@@ -1,16 +1,16 @@
-<div class="toolbar" role="region" aria-label="Reader Toolbar">
+<div class="toolbar" role="region" [aria-label]="i18n.t('reader.toolbar_label')">
   <div class="left">
     <strong>{{ title }}</strong>
-    <span class="muted" *ngIf="totalPages">Seite {{ page }} / {{ totalPages }}</span>
+    <span class="muted" *ngIf="totalPages">{{ i18n.t('reader.page_info', { page: page, total: totalPages }) }}</span>
   </div>
   <div class="right">
-    <button (click)="toggleRtl.emit()" aria-label="Leserichtung umschalten">Richtung: {{ rtl ? 'RTL' : 'LTR' }}</button>
-    <button (click)="toggleSpread.emit()" aria-label="Spread umschalten">Spread: {{ spread ? '2-up' : '1-up' }}</button>
-    <button (click)="zoomOut.emit()" aria-label="Zoom verkleinern">-</button>
+    <button (click)="toggleRtl.emit()" [aria-label]="i18n.t('reader.direction', { value: (rtl ? 'RTL' : 'LTR') })">{{ i18n.t('reader.direction', { value: (rtl ? 'RTL' : 'LTR') }) }}</button>
+    <button (click)="toggleSpread.emit()" [aria-label]="i18n.t('reader.spread', { value: (spread ? '2-up' : '1-up') })">{{ i18n.t('reader.spread', { value: (spread ? '2-up' : '1-up') }) }}</button>
+    <button (click)="zoomOut.emit()" [aria-label]="i18n.t('reader.zoom_out')">-</button>
     <span class="muted">{{ zoomPercent }}%</span>
-    <button (click)="zoomIn.emit()" aria-label="Zoom vergrößern">+</button>
-    <button (click)="prev.emit()" aria-label="Vorherige Seite">←</button>
-    <button (click)="next.emit()" aria-label="Nächste Seite">→</button>
+    <button (click)="zoomIn.emit()" [aria-label]="i18n.t('reader.zoom_in')">+</button>
+    <button (click)="prev.emit()" [aria-label]="i18n.t('reader.prev')">←</button>
+    <button (click)="next.emit()" [aria-label]="i18n.t('reader.next')">→</button>
   </div>
 </div>
 

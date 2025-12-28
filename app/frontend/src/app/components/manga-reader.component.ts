@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core'
+import { I18nService } from '../services/i18n.service'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ChapterService, ChapterRef } from '../services/chapter.service'
@@ -30,7 +31,7 @@ export class MangaReaderComponent implements OnDestroy {
   private prefetching = new Set<number>()
   private destroyed = false
 
-  constructor(private route: ActivatedRoute, private router: Router, private chapters: ChapterService) {
+  constructor(private route: ActivatedRoute, private router: Router, private chapters: ChapterService, public i18n: I18nService) {
     try { (GlobalWorkerOptions as any).workerSrc = '/assets/pdf.worker.min.mjs?v=revolution' } catch { }
     const slug = this.route.snapshot.paramMap.get('slug') || 'one-piece'
     const chapter = this.route.snapshot.paramMap.get('chapter') || '001'

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common'
 import { ApiService } from '../services/api.service'
 import { ToastService } from '../services/toast.service'
 import { BurstService } from '../services/burst.service'
+import { I18nService } from '../services/i18n.service'
 
 @Component({
   standalone: true,
@@ -30,7 +31,7 @@ import { BurstService } from '../services/burst.service'
             </svg>
           </div>
           <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-1">Manga Shelf</h1>
-          <p class="text-gray-500 dark:text-gray-400 text-sm">Willkommen zurück!</p>
+          <p class="text-gray-500 dark:text-gray-400 text-sm">{{ i18n.t('pages.login.welcome') }}</p>
         </div>
 
         <!-- Login form -->
@@ -38,10 +39,10 @@ import { BurstService } from '../services/burst.service'
           <!-- Email field -->
           <div class="space-y-2">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="email">
-              E-Mail
+              {{ i18n.t('pages.login.email') }}
             </label>
             <div class="relative">
-              <div *ngIf="!email" class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                 </svg>
@@ -55,7 +56,7 @@ import { BurstService } from '../services/burst.service'
                 [(ngModel)]="email" 
                 placeholder="admin@example.com"
                 required
-                class="login-input pl-14"
+                class="login-input"
               />
             </div>
           </div>
@@ -63,10 +64,10 @@ import { BurstService } from '../services/burst.service'
           <!-- Password field -->
           <div class="space-y-2">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="password">
-              Passwort
+              {{ i18n.t('pages.login.password') }}
             </label>
             <div class="relative">
-              <div *ngIf="!password" class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                 </svg>
@@ -79,12 +80,14 @@ import { BurstService } from '../services/burst.service'
                 [(ngModel)]="password" 
                 placeholder="••••••••"
                 required
-                class="login-input pl-14 pr-10"
+                class="login-input"
               />
               <button 
                 type="button" 
                 (click)="showPassword = !showPassword"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                [title]="showPassword ? i18n.t('pages.login.hide_password') : i18n.t('pages.login.show_password')"
+                [aria-label]="showPassword ? i18n.t('pages.login.hide_password') : i18n.t('pages.login.show_password')"
               >
                 <svg *ngIf="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -103,20 +106,20 @@ import { BurstService } from '../services/burst.service'
             [disabled]="!f.form.valid || loading"
             class="login-button w-full"
           >
-            <span *ngIf="!loading">Anmelden</span>
+            <span *ngIf="!loading">{{ i18n.t('pages.login.signin') }}</span>
             <span *ngIf="loading" class="flex items-center justify-center gap-2">
               <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Wird angemeldet...
+              {{ i18n.t('pages.login.signing_in') }}
             </span>
           </button>
         </form>
 
         <!-- Footer hint -->
         <p class="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
-          Sichere Verbindung • Deine private Manga-Bibliothek
+          {{ i18n.t('pages.login.footer_hint') }}
         </p>
       </div>
     </div>
@@ -186,12 +189,13 @@ import { BurstService } from '../services/burst.service'
 
     .login-input {
       width: 100%;
-      padding: 0.875rem 1rem;
+      padding: 0.875rem 3rem;
       border: 2px solid #e5e7eb;
       border-radius: 12px;
       font-size: 1rem;
       transition: all 0.2s ease;
       background: rgba(255, 255, 255, 0.8);
+      text-align: center;
     }
     .login-input:focus {
       outline: none;
@@ -248,7 +252,8 @@ export class LoginPage {
     private router: Router,
     private route: ActivatedRoute,
     private bursts: BurstService,
-    private toast: ToastService
+    private toast: ToastService,
+    public i18n: I18nService
   ) { }
 
   async submit() {
@@ -258,11 +263,11 @@ export class LoginPage {
     try {
       await this.api.login(this.email, this.password)
       this.bursts.trigger(24)
-      this.toast.show('Erfolgreich angemeldet', 'success')
+      this.toast.show(this.i18n.t('pages.login.success'), 'success')
       const ret = this.route.snapshot.queryParamMap.get('returnUrl') || '/library'
       this.router.navigateByUrl(ret)
     } catch {
-      this.toast.show('Login fehlgeschlagen', 'error')
+      this.toast.show(this.i18n.t('pages.login.failed'), 'error')
     } finally {
       this.loading = false
     }

@@ -34,13 +34,13 @@ function extractToken(req: Request): string | null {
   // Limited support for token in query for PDF/image streaming routes to improve cross-origin compatibility in dev
   try {
     const p = req.path || ''
-    const isStream = /^\/api\/books\/\d+\/(stream|pages\/)/.test(p)
+    const isStream = /^\/api\/books\/\d+\/(stream|pages\/|cover)/.test(p)
     if (isStream) {
       const q: any = req.query || {}
       const t = (q.token || q.access_token) as string | undefined
       if (t && typeof t === 'string') return t
     }
-  } catch {}
+  } catch { }
   return readCookie()
 }
 

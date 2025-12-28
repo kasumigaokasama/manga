@@ -5,6 +5,7 @@ import { ApiService } from '../services/api.service'
 import { HapticsService } from '../services/haptics.service'
 import { BurstService } from '../services/burst.service'
 import { ToastService } from '../services/toast.service'
+import { I18nService } from '../services/i18n.service'
 
 @Component({
   standalone: true,
@@ -12,38 +13,60 @@ import { ToastService } from '../services/toast.service'
   imports: [CommonModule, FormsModule],
   template: `
     <section class="max-w-xl mx-auto card space-y-4">
-      <h1 class="text-lg font-bold">Upload</h1>
+      <h1 class="text-lg font-bold">{{ i18n.t('pages.upload.title') }}</h1>
       <p class="text-sm text-gray-600">
-        Unterstützte Formate: PDF, EPUB, CBZ/ZIP oder ZIP mit Bilder-Ordnern. Die Dateien landen in
-        <code>storage/originals</code>.
+        {{ i18n.t('pages.upload.description') }}
       </p>
       <form (ngSubmit)="submit()" class="space-y-3">
         <div class="grid gap-2">
-          <label class="text-sm font-medium" for="title">Titel *</label>
-          <input id="title" type="text" class="w-full border p-2 rounded" placeholder="Titel" [(ngModel)]="title" name="title" required />
+          <label class="text-sm font-medium" for="title">{{ i18n.t('pages.upload.field_title') }}</label>
+          <input id="title" type="text" class="w-full border p-2 rounded" [placeholder]="i18n.t('pages.upload.field_title')" [(ngModel)]="title" name="title" required />
         </div>
         <div class="grid gap-2">
-          <label class="text-sm font-medium" for="author">Autor / Zeichner</label>
-          <input id="author" type="text" class="w-full border p-2 rounded" placeholder="Autor" [(ngModel)]="author" name="author" />
+          <label class="text-sm font-medium" for="author">{{ i18n.t('pages.upload.field_author') }}</label>
+          <input id="author" type="text" class="w-full border p-2 rounded" [placeholder]="i18n.t('pages.upload.field_author')" [(ngModel)]="author" name="author" />
         </div>
         <div class="grid gap-2">
-          <label class="text-sm font-medium" for="language">Sprache</label>
+          <label class="text-sm font-medium" for="language">{{ i18n.t('pages.upload.field_language') }}</label>
           <input id="language" type="text" class="w-full border p-2 rounded" placeholder="z. B. de, en, ja" [(ngModel)]="language" name="language" />
         </div>
         <div class="grid gap-2">
-          <label class="text-sm font-medium" for="tags">Tags (Komma-getrennt)</label>
+          <label class="text-sm font-medium" for="tags">{{ i18n.t('pages.upload.field_tags') }}</label>
           <input id="tags" type="text" class="w-full border p-2 rounded" placeholder="Action, Romance" [(ngModel)]="tags" name="tags" />
         </div>
 
-        <div class="space-y-2" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
-          <label class="text-sm font-medium">Datei</label>
-          <input #fileInput type="file" accept=".pdf,.epub,.cbz,.zip" (change)="onFile($event)" />
-          <p *ngIf="file" class="text-xs text-gray-500">Ausgewählt: {{ file?.name }}</p>
-          <div *ngIf="dragActive" class="text-xs text-gray-500">Datei hier ablegen…</div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium">{{ i18n.t('pages.upload.field_file') }}</label>
+          <div 
+            class="relative border-2 border-dashed rounded-lg p-6 transition-all flex flex-col items-center justify-center gap-3"
+            [ngClass]="dragActive ? 'border-kurenai bg-kurenai/5' : 'border-gray-300 hover:border-matcha bg-gray-50'"
+            (dragover)="onDragOver($event)" 
+            (dragleave)="onDragLeave($event)" 
+            (drop)="onDrop($event)"
+          >
+            <input #fileInput type="file" class="hidden" accept=".pdf,.epub,.cbz,.zip" (change)="onFile($event)" />
+            
+            <div class="flex items-center gap-3">
+              <button 
+                type="button" 
+                (click)="fileInput.click()"
+                class="bg-white border border-gray-300 px-4 py-2 rounded shadow-sm hover:bg-gray-50 active:scale-95 transition-all text-sm font-medium"
+              >
+                {{ i18n.t('pages.upload.select_file') }}
+              </button>
+              <span class="text-sm text-gray-500 truncate max-w-[200px]">
+                {{ file ? file.name : i18n.t('pages.upload.no_file_selected') }}
+              </span>
+            </div>
+            
+            <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+              {{ i18n.t('pages.upload.drag_drop') }}
+            </div>
+          </div>
         </div>
 
         <button class="bg-matcha text-white px-4 py-2 rounded w-full transition-all disabled:opacity-50" [disabled]="busy" type="button" (click)="submit()">
-          {{ busy ? 'Upload läuft...' : 'Hochladen' }}
+          {{ busy ? i18n.t('pages.upload.busy') : i18n.t('pages.upload.button') }}
         </button>
       </form>
 
@@ -72,7 +95,8 @@ export class UploadPage {
     private bursts: BurstService,
     private toast: ToastService,
     private haptics: HapticsService,
-    private zone: NgZone
+    private zone: NgZone,
+    public i18n: I18nService
   ) { }
 
   onFile(event: Event) {
@@ -102,7 +126,7 @@ export class UploadPage {
 
   async submit() {
     if (this.busy || !this.file) {
-      if (!this.file) this.toast.show('Bitte eine Datei auswählen.', 'error')
+      if (!this.file) this.toast.show(this.i18n.t('pages.upload.error_no_file'), 'error')
       return
     }
     const form = new FormData()
@@ -119,12 +143,12 @@ export class UploadPage {
       await this.uploadWithProgress(form)
       this.bursts.trigger(24)
       this.haptics.success()
-      this.toast.show('Upload erfolgreich abgeschlossen', 'success')
+      this.toast.show(this.i18n.t('pages.upload.success'), 'success')
       this.resetForm()
     } catch (err) {
       console.error(err)
       this.haptics.error()
-      this.toast.show('Fehler beim Upload', 'error')
+      this.toast.show(this.i18n.t('pages.upload.failed'), 'error')
     } finally {
       this.zone.run(() => {
         this.busy = false
@@ -159,7 +183,7 @@ export class UploadPage {
         })
       }
 
-      xhr.onerror = () => this.zone.run(() => reject(new Error('Upload fehlgeschlagen')))
+      xhr.onerror = () => this.zone.run(() => reject(new Error(this.i18n.t('pages.upload.failed'))))
       xhr.onload = () => {
         this.zone.run(() => {
           if (xhr.status >= 200 && xhr.status < 300) {

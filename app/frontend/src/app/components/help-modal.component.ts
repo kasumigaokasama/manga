@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { I18nService } from '../services/i18n.service'
 
 @Component({
   standalone: true,
@@ -14,33 +15,33 @@ import { CommonModule } from '@angular/common'
     <div class="panel" (click)="$event.stopPropagation()"
          [ngClass]="{'bg-white text-aizome': dayMode, 'bg-slate-800 text-slate-100': !dayMode}">
       <div class="flex items-center justify-between mb-2">
-        <h2 class="text-lg font-bold">Hilfe &amp; Schnelltest</h2>
-        <button class="border px-2 py-1 rounded" (click)="close.emit()">Schließen</button>
+        <h2 class="text-lg font-bold">{{ i18n.t('pages.help.title') }}</h2>
+        <button class="border px-2 py-1 rounded" (click)="close.emit()">{{ i18n.t('common.close') }}</button>
       </div>
       <div class="text-sm space-y-2">
         <div>
-          <strong>Login</strong>: admin@example.com / ChangeThis123!
+          <strong>{{ i18n.t('common.login') }}</strong>: {{ i18n.t('pages.help.login') }}
         </div>
         <div>
-          <strong>Upload</strong>: CBZ/PDF hochladen &rarr; Bibliothek zeigt Cover bzw. Reader-Link.
+          <strong>{{ i18n.t('common.upload') }}</strong>: {{ i18n.t('pages.help.upload') }}
         </div>
         <div>
-          <strong>Reader</strong>: Pfeile/Tippen zum Blättern, Scrubber unten, RTL/2-up umschalten.
+          <strong>{{ i18n.t('reader.page_single') }}</strong>: {{ i18n.t('pages.help.reader') }}
         </div>
         <div>
-          <strong>Downloads &amp; Streaming</strong>: EPUB via <code>/api/books/:id/download</code>. PDFs per Range-Streaming (<code>GET /api/books/:id/stream</code>), Metadaten via <code>HEAD</code>.
+          <strong>Downloads &amp; Streaming</strong>: {{ i18n.t('pages.help.downloads') }}
         </div>
         <div>
-          <strong>Theme</strong>: Toolbar &bdquo;Theme&ldquo; &rarr; Presets (Day/Night/Minimal), Sterne/Blüten ein/aus.
+          <strong>{{ i18n.t('common.theme') }}</strong>: {{ i18n.t('pages.help.theme') }}
         </div>
         <div>
-          <strong>Effekte</strong>: Petal-Bursts bei Login/Upload; Sound in Einstellungen aktivierbar.
+          <strong>Effekte</strong>: {{ i18n.t('pages.help.effects') }}
         </div>
         <div>
-          <strong>Admin</strong>: Seite /admin für Benutzerverwaltung; Audit-Log live.
+          <strong>{{ i18n.t('common.admin') }}</strong>: {{ i18n.t('pages.help.admin') }}
         </div>
         <div>
-          <strong>Tastatur</strong>: &larr;/&rarr; Blättern (RTL respektiert), [ / ] Zoom, F Vollbild, R Richtung, S Spread, D Sakura.
+          <strong>{{ i18n.t('pages.admin.maintenance') }}</strong>: {{ i18n.t('pages.help.keyboard') }}
         </div>
       </div>
     </div>
@@ -48,6 +49,7 @@ import { CommonModule } from '@angular/common'
   `
 })
 export class HelpModalComponent {
+  constructor(public i18n: I18nService) { }
   @Input() open = false
   @Input() dayMode = true
   @Output() close = new EventEmitter<void>()

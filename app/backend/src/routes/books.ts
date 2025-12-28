@@ -10,6 +10,7 @@ import unzipper from 'unzipper'
 import sharp from 'sharp'
 import { PDFDocument } from 'pdf-lib'
 import { XMLParser } from 'fast-xml-parser'
+import { sql } from 'kysely'
 import { db, paths } from '../db.js'
 import { authRequired } from '../middleware/auth.js'
 import { appendAudit } from '../util/audit.js'
@@ -65,8 +66,13 @@ router.get('/', authRequired(), async (req, res) => {
   const orderCol = ['createdAt', 'title', 'updatedAt'].includes(col) ? (col as any) : 'createdAt'
   const orderDir = dir === 'asc' ? 'asc' : 'desc'
 
+  if (orderCol === 'title') {
+    q = q.orderBy(sql`title collate nocase`, orderDir)
+  } else {
+    q = q.orderBy(orderCol, orderDir)
+  }
+
   const rows = await q
-    .orderBy(orderCol, orderDir)
     .limit(take + 1)
     .offset((currentPage - 1) * take)
     .execute()
@@ -117,7 +123,7 @@ router.get('/:id', authRequired(), async (req, res) => {
           const pdfBytes = fs.readFileSync(file)
           const pdfDoc = await PDFDocument.load(pdfBytes)
           updates.pageCount = pdfDoc.getPageCount()
-        } catch {}
+        } catch { }
         await db.updateTable('books').set(updates).where('id', '=', id).execute()
         book = { ...book, ...updates }
       }
@@ -130,10 +136,10 @@ router.get('/:id', authRequired(), async (req, res) => {
           await db.updateTable('books').set({ coverPath, previewPath, updatedAt: new Date().toISOString() }).where('id', '=', id).execute()
           book.coverPath = coverPath
           book.previewPath = previewPath
-        } catch {}
+        } catch { }
       }
     }
-  } catch {}
+  } catch { }
   const tags = await db
     .selectFrom('book_tags as bt')
     .innerJoin('tags as t', 't.id', 'bt.tagId')
@@ -181,7 +187,8 @@ router.get('/:id/stream', authRequired(), async (req, res) => {
       'Content-Length': chunkSize,
       'Content-Type': contentType,
       'Cache-Control': 'private, max-age=0'
-    , ...extraHeaders })
+      , ...extraHeaders
+    })
     fs.createReadStream(file, { start, end }).pipe(res)
   } else {
     res.writeHead(200, {
@@ -189,7 +196,8 @@ router.get('/:id/stream', authRequired(), async (req, res) => {
       'Content-Type': contentType,
       'Accept-Ranges': 'bytes',
       'Cache-Control': 'private, max-age=0'
-    , ...extraHeaders })
+      , ...extraHeaders
+    })
     fs.createReadStream(file).pipe(res)
   }
 })
@@ -476,21 +484,21 @@ router.post('/heal', adminTokenOrRole(['admin']), async (_req, res) => {
           const pdfBytes = fs.readFileSync(b.filePath)
           const pdfDoc = await PDFDocument.load(pdfBytes)
           updates.pageCount = pdfDoc.getPageCount()
-        } catch {}
+        } catch { }
       }
       if (!b.coverPath) {
         try {
           await generatePlaceholderCover(b.id)
           updates.coverPath = `/thumbnails/${b.id}.jpg`
           updates.previewPath = `/previews/${b.id}.jpg`
-        } catch {}
+        } catch { }
       }
       if (Object.keys(updates).length) {
         updates.updatedAt = new Date().toISOString()
         await db.updateTable('books').set(updates).where('id', '=', b.id).execute()
         fixed++
       }
-    } catch {}
+    } catch { }
   }
   res.json({ ok: true, fixed })
 })

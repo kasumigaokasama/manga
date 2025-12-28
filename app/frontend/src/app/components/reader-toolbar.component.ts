@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { I18nService } from '../services/i18n.service'
 
 @Component({
   standalone: true,
@@ -7,6 +8,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
   styleUrls: ['./reader-toolbar.component.css']
 })
 export class ReaderToolbarComponent {
+  constructor(public i18n: I18nService) { }
   @Input() title = ''
   @Input() page = 1
   @Input() totalPages = 0

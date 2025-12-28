@@ -2,12 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{
+:root {
   --sakura: #F9D5E5;
   --kurenai: #C21F39;
   --aizome: #0F2D5C;
   --matcha: #3DA35D;
   --kumo: #F5F6FA;
+  --emerald: #10b981;
 }
 
 body {
@@ -29,35 +30,144 @@ body {
   @apply rounded-xl shadow-md bg-white p-4;
 }
 
-.card { transition: transform .2s ease, box-shadow .2s ease; }
-.card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
+.card {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
 
 /* Sakura subtle background pattern */
 body.theme-sakura {
   background-image:
-    radial-gradient(circle at 10px 10px, rgba(249,213,229,0.25) 2px, rgba(0,0,0,0) 3px),
-    radial-gradient(circle at 30px 30px, rgba(249,213,229,0.2) 2px, rgba(0,0,0,0) 3px);
+    radial-gradient(circle at 10px 10px, rgba(249, 213, 229, 0.25) 2px, rgba(0, 0, 0, 0) 3px),
+    radial-gradient(circle at 30px 30px, rgba(249, 213, 229, 0.2) 2px, rgba(0, 0, 0, 0) 3px);
   background-size: 40px 40px;
 }
 
 /* Cute wobble for header title */
-@keyframes sakura-wobble { 0%{ transform: rotate(0deg) } 50%{ transform: rotate(2deg) } 100%{ transform: rotate(0deg) } }
-header a.font-bold { display: inline-block; animation: sakura-wobble 6s ease-in-out infinite; }
+@keyframes sakura-wobble {
+  0% {
+    transform: rotate(0deg)
+  }
 
-.theme-dark body, body.theme-dark {
+  50% {
+    transform: rotate(2deg)
+  }
+
+  100% {
+    transform: rotate(0deg)
+  }
+}
+
+body.theme-emerald {
+  background: #ecfdf5;
+  color: #064e3b;
+  background-image:
+    radial-gradient(circle at 20px 20px, rgba(16, 185, 129, 0.05) 2px, transparent 3px);
+  background-size: 40px 40px;
+}
+
+.theme-emerald .card {
+  @apply bg-white border border-emerald-100 shadow-sm;
+}
+
+.theme-emerald .text-matcha {
+  color: var(--emerald);
+}
+
+header a.font-bold {
+  display: inline-block;
+  animation: sakura-wobble 6s ease-in-out infinite;
+}
+
+.theme-dark body,
+body.theme-dark {
   background: #0f172a;
   color: #e2e8f0;
 }
-.theme-dark .card { @apply bg-slate-800 text-slate-100; }
-.theme-dark a { color: #93c5fd; }
-.theme-dark .mat-toolbar { background: #111827 !important; color: #e5e7eb !important; }
-.theme-dark .mat-button, .theme-dark .mat-mdc-button { color: #e5e7eb !important; }
+
+.theme-dark .card {
+  @apply bg-slate-800 text-slate-100 border border-slate-700;
+}
+
+.theme-dark a {
+  color: #93c5fd;
+}
+
+.theme-dark .mat-toolbar {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+.theme-dark .mat-button,
+.theme-dark .mat-mdc-button {
+  color: #e5e7eb !important;
+}
+
+/* Dark Mode Form Elements */
+.theme-dark input:not([type="checkbox"]):not([type="range"]),
+.theme-dark select,
+.theme-dark textarea {
+  @apply bg-slate-900 border-slate-700 text-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+}
+
+.theme-dark input::placeholder {
+  @apply text-slate-500;
+}
+
+.theme-dark input[type="range"] {
+  @apply accent-blue-500;
+}
+
+.theme-dark .bg-emerald-50 {
+  @apply bg-emerald-900/20 text-emerald-400 border border-emerald-900/30;
+}
+
+.theme-dark .bg-blue-50 {
+  @apply bg-blue-900/20 text-blue-400 border border-blue-900/30;
+}
+
+/* Granular Utility Overrides for Dark Mode */
+.theme-dark .bg-white {
+  @apply bg-slate-800 text-slate-100;
+}
+
+.theme-dark .bg-gray-50,
+.theme-dark pre.bg-gray-50 {
+  @apply bg-slate-900 text-slate-300;
+}
+
+.theme-dark .bg-gray-200 {
+  @apply bg-slate-700 text-slate-100;
+}
+
+.theme-dark .hover\:bg-gray-50:hover {
+  @apply hover:bg-slate-700;
+}
+
+.theme-dark .border-gray-200,
+.theme-dark .border-gray-300 {
+  @apply border-slate-700;
+}
+
+.theme-dark .text-gray-500,
+.theme-dark .text-gray-600 {
+  @apply text-slate-400;
+}
 
 /* Night tweaks for blossoms to be subtler over dark */
-.theme-dark app-blossoms { opacity: 0.8; }
+.theme-dark app-blossoms {
+  opacity: 0.8;
+}
 
 /* Action buttons: render icon via Material Icons and hide stray text */
-button[title="Mehr Optionen"] { font-size: 0; }
+button[title="Mehr Optionen"] {
+  font-size: 0;
+}
+
 button[title="Mehr Optionen"]::before {
   content: 'more_horiz';
   font-family: 'Material Icons';
@@ -66,11 +176,33 @@ button[title="Mehr Optionen"]::before {
 }
 
 /* Reader centering and mobile fit */
-.reader-pdf canvas { max-width: 100%; height: auto; display: block; margin: 0 auto; }
-.reader-images img { max-width: 100%; height: auto; }
-.tap-zone { position: absolute; top: 0; bottom: 0; width: 50%; pointer-events: auto; }
-.tap-zone.left { left: 0; }
-.tap-zone.right { right: 0; }
+.reader-pdf canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.reader-images img {
+  max-width: 100%;
+  height: auto;
+}
+
+.tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  pointer-events: auto;
+}
+
+.tap-zone.left {
+  left: 0;
+}
+
+.tap-zone.right {
+  right: 0;
+}
 
 /* iPhone safe area padding for bottom controls */
 @supports (padding: max(0px)) {
@@ -78,12 +210,18 @@ button[title="Mehr Optionen"]::before {
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
+
 /* Larger touch targets on coarse pointers (mobile) */
 @media (pointer: coarse) {
-  .card [title="Benutzer loeschen"], .card [title="Passwort setzen"],
-  .card [title="Original herunterladen"], .card [title="Mehr Optionen"] {
+
+  .card [title="Benutzer loeschen"],
+  .card [title="Passwort setzen"],
+  .card [title="Original herunterladen"],
+  .card [title="Mehr Optionen"] {
     padding: 10px 12px;
-    min-width: 44px; min-height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
 }
+
 /* DevExtreme removed */
