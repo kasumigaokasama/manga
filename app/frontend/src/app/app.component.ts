@@ -74,12 +74,9 @@ import { ToastContainerComponent } from './components/toast-container.component'
       <div class="flex gap-2">
         <button class="border px-2 py-1 rounded" (click)="theme.preset('sakura-day'); themeMenuOpen=false">Sakura Day</button>
         <button class="border px-2 py-1 rounded" (click)="theme.preset('sakura-night'); themeMenuOpen=false">Night</button>
-        <button class="border px-2 py-1 rounded" (click)="theme.preset('minimal'); themeMenuOpen=false">Minimal</button>
+        <button class="border px-2 py-1 rounded" (click)="theme.preset('emerald-forest'); themeMenuOpen=false">Emerald Forest</button>
       </div>
       <div class="mt-3 grid gap-2">
-        <label class="flex items-center gap-2">
-          <input type="checkbox" [checked]="theme.sakura()" (change)="onSakuraToggle($event)" /> {{ i18n.t('pages.settings.sakura_theme') }}
-        </label>
         <label class="flex items-center gap-2">
           <input type="checkbox" [checked]="theme.blossoms()" (change)="theme.setBlossoms($any($event.target).checked)" /> {{ i18n.t('pages.settings.blossoms_animation') }}
         </label>
