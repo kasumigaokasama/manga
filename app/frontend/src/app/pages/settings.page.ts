@@ -23,30 +23,51 @@ import { I18nService } from '../services/i18n.service'
       </div>
       <h1 class="text-lg font-bold mb-2">{{ i18n.t('pages.settings.title') }}</h1>
       <div class="space-y-2">
-        <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="theme.blossoms()" (ngModelChange)="theme.setBlossoms($event)" /> {{ i18n.t('pages.settings.blossoms_animation') }}</label>
-        <div class="grid grid-cols-2 gap-2" *ngIf="theme.blossoms()">
-          <label class="flex items-center gap-2 col-span-2">{{ i18n.t('pages.settings.density', { value: theme.blossomsDensity() }) }}
-            <input type="range" min="10" max="120" [ngModel]="theme.blossomsDensity()" (ngModelChange)="theme.setBlossomsDensity($event)" />
-          </label>
-          <label class="flex items-center gap-2 col-span-2">{{ i18n.t('pages.settings.speed', { value: (theme.blossomsSpeed() | number:'1.1-1') }) }}
-            <input type="range" min="0.5" max="2" step="0.1" [ngModel]="theme.blossomsSpeed()" (ngModelChange)="theme.setBlossomsSpeed($event)" />
-          </label>
+        <!-- Blossoms (Sakura theme only) -->
+        <div *ngIf="theme.sakura()">
+          <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="theme.blossoms()" (ngModelChange)="theme.setBlossoms($event)" /> {{ i18n.t('pages.settings.blossoms_animation') }}</label>
+          <div class="grid grid-cols-2 gap-2 mt-2" *ngIf="theme.blossoms()">
+            <label class="flex items-center gap-2 col-span-2">{{ i18n.t('pages.settings.density', { value: theme.blossomsDensity() }) }}
+              <input type="range" min="10" max="120" [ngModel]="theme.blossomsDensity()" (ngModelChange)="theme.setBlossomsDensity($event)" />
+            </label>
+            <label class="flex items-center gap-2 col-span-2">{{ i18n.t('pages.settings.speed', { value: (theme.blossomsSpeed() | number:'1.1-1') }) }}
+              <input type="range" min="0.5" max="2" step="0.1" [ngModel]="theme.blossomsSpeed()" (ngModelChange)="theme.setBlossomsSpeed($event)" />
+            </label>
+          </div>
         </div>
+
+        <!-- Emerald Rain (Emerald theme only) -->
+        <div *ngIf="theme.emerald()">
+          <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="theme.emeraldRain()" (ngModelChange)="theme.setEmeraldRain($event)" /> {{ i18n.t('pages.settings.emerald_rain') }}</label>
+          <div class="grid grid-cols-2 gap-2 mt-2" *ngIf="theme.emeraldRain()">
+            <label class="flex items-center gap-2 col-span-2">{{ i18n.t('pages.settings.density', { value: theme.emeraldRainDensity() }) }}
+              <input type="range" min="10" max="120" [ngModel]="theme.emeraldRainDensity()" (ngModelChange)="theme.setEmeraldRainDensity($event)" />
+            </label>
+            <label class="flex items-center gap-2 col-span-2">{{ i18n.t('pages.settings.speed', { value: (theme.emeraldRainSpeed() | number:'1.1-1') }) }}
+              <input type="range" min="0.5" max="2" step="0.1" [ngModel]="theme.emeraldRainSpeed()" (ngModelChange)="theme.setEmeraldRainSpeed($event)" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Stars (Dark theme only) -->
+        <div *ngIf="theme.dark()">
+          <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="theme.starfieldEnabled()" (ngModelChange)="theme.setStarfieldEnabled($event)" /> {{ i18n.t('pages.settings.starfield_enabled') }}</label>
+          <div class="grid grid-cols-2 gap-2 mt-2" *ngIf="theme.starfieldEnabled()">
+            <label class="flex items-center gap-2 col-span-2">{{ i18n.t('pages.settings.star_density', { value: theme.starDensity() }) }}
+              <input type="range" min="40" max="600" [ngModel]="theme.starDensity()" (ngModelChange)="theme.setStarDensity($event)" />
+            </label>
+          </div>
+        </div>
+
         <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="settings.readerRtl()" (ngModelChange)="settings.setReaderRtl($event)" /> {{ i18n.t('pages.settings.reader_rtl') }}</label>
         <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="settings.readerSpread()" (ngModelChange)="settings.setReaderSpread($event)" /> {{ i18n.t('pages.settings.reader_spread') }}</label>
         <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="settings.forceMobile()" (ngModelChange)="settings.setForceMobile($event)" /> {{ i18n.t('pages.settings.force_mobile') }}</label>
         <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="settings.toolbarIconsOnly()" (ngModelChange)="settings.setToolbarIconsOnly($event)" /> {{ i18n.t('pages.settings.toolbar_compact') }}</label>
         <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="settings.showOfflineBadge()" (ngModelChange)="settings.setShowOfflineBadge($event)" /> {{ i18n.t('pages.settings.offline_badge') }}</label>
         <label class="flex items-center gap-2"><input type="checkbox" [ngModel]="settings.aggressivePrefetch()" (ngModelChange)="settings.setAggressivePrefetch($event)" /> {{ i18n.t('pages.settings.aggressive_prefetch') }}</label>
-        <div class="grid grid-cols-2 gap-2" *ngIf="!theme.sakura()">
-          <label class="flex items-center gap-2 col-span-2">{{ i18n.t('pages.settings.star_density', { value: theme.starDensity() }) }}
-            <input type="range" min="40" max="600" [ngModel]="theme.starDensity()" (ngModelChange)="theme.setStarDensity($event)" />
-          </label>
-          <label class="flex items-center gap-2 col-span-2"><input type="checkbox" [ngModel]="theme.starfieldEnabled()" (ngModelChange)="theme.setStarfieldEnabled($event)" /> {{ i18n.t('pages.settings.starfield_enabled') }}</label>
-        </div>
         <div class="flex flex-wrap gap-2 pt-2">
-          <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('sakura-day')">{{ i18n.t('pages.settings.preset_sakura_day') }}</button>
-          <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('sakura-night')">{{ i18n.t('pages.settings.preset_sakura_night') }}</button>
+          <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('sakura')">{{ i18n.t('pages.settings.preset_sakura') }}</button>
+          <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('night')">{{ i18n.t('pages.settings.preset_night') }}</button>
           <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="theme.preset('emerald-forest')">{{ i18n.t('pages.settings.preset_emerald_forest') }}</button>
           <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="mobilePreset()">{{ i18n.t('pages.settings.preset_mobile') }}</button>
           <button class="border px-3 py-1 rounded hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" (click)="resetThemeOnly()" [title]="i18n.t('pages.settings.reset_theme')">{{ i18n.t('pages.settings.reset_theme') }}</button>
@@ -97,8 +118,8 @@ export class SettingsPage implements OnInit {
   }
 
   resetAll() {
-    // Theme preset to Sakura Day defaults
-    this.theme.preset('sakura-day')
+    // Theme preset to Sakura defaults
+    this.theme.preset('sakura')
     // Reader defaults: RTL on for Manga, spread off
     this.settings.setReaderRtl(true)
     this.settings.setReaderSpread(false)
@@ -109,17 +130,18 @@ export class SettingsPage implements OnInit {
   }
 
   resetThemeOnly() {
-    this.theme.preset('sakura-day')
+    this.theme.preset('sakura')
     this.toast.show(this.i18n.t('pages.settings.reset_confirm_theme'), 'info')
   }
 
   mobilePreset() {
     // Designed for iPhone-size screens: calm blossoms, no stars, 1-up reading
-    this.theme.setSakura(true)
+    this.theme.setTheme('sakura')
     this.theme.setBlossoms(true)
     this.theme.setBlossomsDensity(50)
     this.theme.setBlossomsSpeed(1)
     this.theme.setStarfieldEnabled(false)
+    this.theme.setEmeraldRain(false)
     this.settings.setReaderSpread(false)
     this.toast.show(this.i18n.t('pages.settings.preset_mobile') + ' ' + this.i18n.t('common.success'), 'info')
   }

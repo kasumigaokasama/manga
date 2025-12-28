@@ -26,6 +26,10 @@ body {
   background: linear-gradient(180deg, var(--sakura), #ffffff);
 }
 
+.emerald-bg {
+  background: linear-gradient(180deg, #a7f3d0, #d1fae5);
+}
+
 .card {
   @apply rounded-xl shadow-md bg-white p-4;
 }
@@ -63,19 +67,62 @@ body.theme-sakura {
 }
 
 body.theme-emerald {
-  background: #ecfdf5;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
   color: #064e3b;
   background-image:
-    radial-gradient(circle at 20px 20px, rgba(16, 185, 129, 0.05) 2px, transparent 3px);
-  background-size: 40px 40px;
+    radial-gradient(circle at 20px 20px, rgba(16, 185, 129, 0.08) 2px, transparent 3px),
+    radial-gradient(circle at 40px 40px, rgba(16, 185, 129, 0.05) 1px, transparent 2px);
+  background-size: 60px 60px;
 }
 
 .theme-emerald .card {
-  @apply bg-white border border-emerald-100 shadow-sm;
+  @apply bg-white/90 backdrop-blur-sm border border-emerald-200 shadow-md;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1), 0 2px 4px rgba(16, 185, 129, 0.06);
+}
+
+.theme-emerald .card:hover {
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.15), 0 4px 8px rgba(16, 185, 129, 0.1);
+  border-color: #6ee7b7;
 }
 
 .theme-emerald .text-matcha {
   color: var(--emerald);
+}
+
+/* Emerald Theme Form Elements */
+.theme-emerald input:not([type="checkbox"]):not([type="range"]),
+.theme-emerald select,
+.theme-emerald textarea {
+  @apply bg-emerald-50/50 border-emerald-300 text-emerald-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/50;
+}
+
+.theme-emerald input::placeholder {
+  @apply text-emerald-600/60;
+}
+
+.theme-emerald input[type="range"] {
+  @apply accent-emerald-500;
+}
+
+.theme-emerald button,
+.theme-emerald .border {
+  @apply border-emerald-300;
+}
+
+.theme-emerald button:hover {
+  @apply bg-emerald-50;
+}
+
+.theme-emerald .bg-matcha {
+  @apply bg-emerald-600 hover:bg-emerald-700;
+}
+
+.theme-emerald a:not(.font-bold) {
+  @apply text-emerald-700 hover:text-emerald-900;
+}
+
+.theme-emerald footer {
+  @apply text-emerald-700/70;
 }
 
 header a.font-bold {

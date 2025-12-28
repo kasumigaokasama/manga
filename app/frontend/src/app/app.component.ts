@@ -9,6 +9,7 @@ import { BurstService } from './services/burst.service'
 import { SoundService } from './services/sound.service'
 import { ToastService } from './services/toast.service'
 import { BlossomsComponent } from './components/blossoms.component'
+import { EmeraldRainComponent } from './components/emerald-rain.component'
 import { StarfieldComponent } from './components/starfield.component'
 import { SakuraBranchComponent } from './components/sakura-branch.component'
 import { PetalBurstComponent } from './components/petal-burst.component'
@@ -18,14 +19,14 @@ import { ToastContainerComponent } from './components/toast-container.component'
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, BlossomsComponent, StarfieldComponent, SakuraBranchComponent, PetalBurstComponent, HelpModalComponent, ToastContainerComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, BlossomsComponent, EmeraldRainComponent, StarfieldComponent, SakuraBranchComponent, PetalBurstComponent, HelpModalComponent, ToastContainerComponent],
   template: `
-    <header *ngIf="showHeader" class="shadow relative" [ngClass]="{ 'sakura-bg': theme.sakura(), 'bg-slate-900': !theme.sakura() }">
+    <header *ngIf="showHeader" class="shadow relative" [ngClass]="{ 'sakura-bg': theme.sakura(), 'emerald-bg': theme.emerald(), 'bg-slate-900': theme.dark() }">
       <div class="flex items-center justify-between px-3 py-2">
         <div class="flex items-center gap-2">
-          <a routerLink="/library" class="font-bold text-xl mr-2" [ngClass]="theme.sakura() ? 'text-aizome' : 'text-slate-100'">Manga Shelf</a>
+          <a routerLink="/library" class="font-bold text-xl mr-2" [ngClass]="theme.sakura() ? 'text-aizome' : theme.emerald() ? 'text-emerald-900' : 'text-slate-100'">Manga Shelf</a>
           <app-sakura-branch class="hidden sm:block"></app-sakura-branch>
-          <span class="text-xs sm:text-sm truncate" [ngClass]="theme.sakura() ? 'text-aizome' : 'text-slate-200'" *ngIf="api.email()">{{ api.email() }} ({{ i18n.t('roles.' + api.role()) }})</span>
+          <span class="text-xs sm:text-sm truncate" [ngClass]="theme.sakura() ? 'text-aizome' : theme.emerald() ? 'text-emerald-800' : 'text-slate-200'" *ngIf="api.email()">{{ api.email() }} ({{ i18n.t('roles.' + api.role()) }})</span>
         </div>
         <nav class="hidden md:flex items-center space-x-2 text-sm">
           <a routerLink="/library" routerLinkActive #rlaDLib="routerLinkActive" [ngClass]="{'text-kurenai font-semibold': rlaDLib.isActive}">
@@ -70,17 +71,20 @@ import { ToastContainerComponent } from './components/toast-container.component'
 
     <!-- Theme dropdown -->
     <div *ngIf="themeMenuOpen" #themeMenu class="absolute right-2 mt-2 z-30 bg-white border rounded shadow p-3 text-sm"
-         [ngClass]="{'bg-white text-aizome': theme.sakura(), 'bg-slate-800 text-slate-100': !theme.sakura()}">
+         [ngClass]="{'bg-white text-aizome': theme.sakura(), 'bg-emerald-50 text-emerald-900': theme.emerald(), 'bg-slate-800 text-slate-100': theme.dark()}">
       <div class="flex gap-2">
-        <button class="border px-2 py-1 rounded" (click)="theme.preset('sakura-day'); themeMenuOpen=false">Sakura Day</button>
-        <button class="border px-2 py-1 rounded" (click)="theme.preset('sakura-night'); themeMenuOpen=false">Night</button>
-        <button class="border px-2 py-1 rounded" (click)="theme.preset('emerald-forest'); themeMenuOpen=false">Emerald Forest</button>
+        <button class="border px-2 py-1 rounded" (click)="theme.preset('sakura'); themeMenuOpen=false">{{ i18n.t('pages.settings.preset_sakura') }}</button>
+        <button class="border px-2 py-1 rounded" (click)="theme.preset('night'); themeMenuOpen=false">{{ i18n.t('pages.settings.preset_night') }}</button>
+        <button class="border px-2 py-1 rounded" (click)="theme.preset('emerald-forest'); themeMenuOpen=false">{{ i18n.t('pages.settings.preset_emerald_forest') }}</button>
       </div>
       <div class="mt-3 grid gap-2">
-        <label class="flex items-center gap-2">
+        <label class="flex items-center gap-2" *ngIf="theme.sakura()">
           <input type="checkbox" [checked]="theme.blossoms()" (change)="theme.setBlossoms($any($event.target).checked)" /> {{ i18n.t('pages.settings.blossoms_animation') }}
         </label>
-        <label class="flex items-center gap-2" *ngIf="!theme.sakura()">
+        <label class="flex items-center gap-2" *ngIf="theme.emerald()">
+          <input type="checkbox" [checked]="theme.emeraldRain()" (change)="theme.setEmeraldRain($any($event.target).checked)" /> {{ i18n.t('pages.settings.emerald_rain') }}
+        </label>
+        <label class="flex items-center gap-2" *ngIf="theme.dark()">
           <input type="checkbox" [checked]="theme.starfieldEnabled()" (change)="theme.setStarfieldEnabled($any($event.target).checked)" /> {{ i18n.t('pages.settings.starfield_enabled') }}
         </label>
       </div>
@@ -112,8 +116,9 @@ import { ToastContainerComponent } from './components/toast-container.component'
     </main>
     <footer class="p-4 text-center text-xs text-gray-600">{{ i18n.t('footer.private_use') }}</footer>
     <div *ngIf="!online()" class="fixed bottom-4 left-4 bg-amber-500 text-white text-xs px-3 py-2 rounded shadow z-50" role="status" aria-live="polite">{{ i18n.t('status.offline_status') }}</div>
-    <app-blossoms [enabled]="theme.blossoms()" [density]="theme.blossomsDensity()" [speed]="theme.blossomsSpeed()"></app-blossoms>
-    <app-starfield *ngIf="!theme.sakura() && theme.starfieldEnabled()" [density]="theme.starDensity()"></app-starfield>
+    <app-blossoms [enabled]="theme.sakura() && theme.blossoms()" [density]="theme.blossomsDensity()" [speed]="theme.blossomsSpeed()"></app-blossoms>
+    <app-emerald-rain [enabled]="theme.emerald() && theme.emeraldRain()" [density]="theme.emeraldRainDensity()" [speed]="theme.emeraldRainSpeed()"></app-emerald-rain>
+    <app-starfield *ngIf="theme.dark() && theme.starfieldEnabled()" [density]="theme.starDensity()"></app-starfield>
     <app-petal-burst #globalBurst></app-petal-burst>
     <app-help-modal [open]="helpOpen" [dayMode]="theme.sakura()" (close)="helpOpen=false"></app-help-modal>
     <app-toast-container></app-toast-container>
