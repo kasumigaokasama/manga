@@ -287,7 +287,7 @@ const UploadSchema = z.object({
 function adminTokenOrRole(roles: Role[]) {
   const adminToken = process.env.ADMIN_TOKEN
   return (req: any, res: any, next: any) => {
-    const tok = req.headers['x-admin-token']
+    const tok = req.headers['admin_token']
     const strong = typeof adminToken === 'string' && adminToken.length >= 32
     if (strong && tok === adminToken) {
       req.user = { sub: 0, email: 'admin-token', role: 'admin' }

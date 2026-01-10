@@ -13,7 +13,7 @@ This guide explains how to upload multiple manga chapters or books at once using
 **POST** `/api/books/upload`
 
 **Headers:**
-- `Authorization: Bearer <jwt_token>` OR `x-admin-token: <your_admin_token>`
+- `Authorization: Bearer <jwt_token>` OR `ADMIN_TOKEN: <your_admin_token>`
 
 **Form Data:**
 - `file` (required): The file to upload
@@ -128,7 +128,7 @@ foreach ($file in $files) {
             "Content-Type" = "multipart/form-data; boundary=$boundary"
         }
         if ($AdminToken) {
-            $headers["x-admin-token"] = $AdminToken
+            $headers["ADMIN_TOKEN"] = $AdminToken
         } else {
             $headers["Authorization"] = "Bearer $JwtToken"
         }
@@ -241,7 +241,7 @@ fi
 
 # Build auth header
 if [ -n "$ADMIN_TOKEN" ]; then
-    AUTH_HEADER="x-admin-token: $ADMIN_TOKEN"
+    AUTH_HEADER="ADMIN_TOKEN: $ADMIN_TOKEN"
 else
     AUTH_HEADER="Authorization: Bearer $JWT_TOKEN"
 fi
@@ -408,7 +408,7 @@ async function uploadFile(filePath, index, total) {
 
   const headers = {};
   if (ADMIN_TOKEN) {
-    headers['x-admin-token'] = ADMIN_TOKEN;
+    headers['ADMIN_TOKEN'] = ADMIN_TOKEN;
   } else {
     headers['Authorization'] = `Bearer ${JWT_TOKEN}`;
   }
