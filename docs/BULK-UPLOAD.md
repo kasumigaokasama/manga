@@ -500,6 +500,8 @@ node bulk-upload.mjs `
 
 ### Option A: Admin Token (Recommended for Scripts)
 
+**For local development:**
+
 1. Edit `app/backend/.env`
 2. Set a strong `ADMIN_TOKEN` (32+ characters):
    ```
@@ -507,6 +509,27 @@ node bulk-upload.mjs `
    ```
 3. Restart the backend
 4. Use this token in your scripts
+
+**For Docker deployments:**
+
+1. Create a `.env` file in the `docker/` folder (or set environment variables):
+   ```bash
+   # docker/.env
+   ADMIN_TOKEN=your-very-long-secure-admin-token-here-at-least-32-chars
+   ```
+2. Or pass it directly when starting the container:
+   ```bash
+   ADMIN_TOKEN=your-token docker compose up -d
+   ```
+3. Or add it to your `docker-compose.yml` override:
+   ```yaml
+   environment:
+     - ADMIN_TOKEN=your-very-long-secure-admin-token-here
+   ```
+4. Restart the container:
+   ```bash
+   docker compose down && docker compose up -d
+   ```
 
 ### Option B: JWT Token
 
