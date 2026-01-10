@@ -81,5 +81,6 @@ Adjust `app/backend/.env` as needed:
 
 Detailed documentation can be found in the `docs/` folder:
 - [Development Guide](docs/DEV.md)
+- [Bulk Upload Guide](docs/BULK-UPLOAD.md) - Upload 100+ files via API scripts
 - [Publishing/Deployment](docs/PUBLISHING.md)
 - [QA Checklist](docs/QA-CHECKLIST.md)
